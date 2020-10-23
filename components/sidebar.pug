@@ -1,0 +1,85 @@
+// Page Sidebar Start
+- var status = (sidebar_open ? 'open' : (sidebar_image ? 'native-image-bg' : ''));
+
+.iconsidebar-menu(class=status)
+
+                    div.sidebar
+                        ul.iconMenu-bar.custom-scrollbar
+                            li
+                                a.bar-icons(href='javascript:void(0)')
+                                    //img(src='../assets/images/menu/home.png' alt='')
+                                    i.pe-7s-home
+                                    span Home    
+                                ul.iconbar-mainmenu.custom-scrollbar
+                                    li.iconbar-header Quick Start
+                                    li
+                                        a(href='/home/password-change')
+                                            | Password Change
+                                    li.iconbar-header.sub-header Tech Area
+                                    li
+                                        a(href='/home/keys')
+                                            | Manage SSH Keys
+                                    li
+                                        a(href='/home/2fa')
+                                            | Setup 2FA
+
+                                    li.iconbar-header.sub-header Help
+                                    li
+                                        a(href='../starter-kit/index.html')
+                                            | Find Useful Resources  
+                                            
+                                            
+                            li
+                                a.bar-icons(href='javascript:void(0)')
+                                    i.pe-7s-users
+                                    span Users
+                                ul.iconbar-mainmenu.custom-scrollbar
+                                    li.iconbar-header Manage
+                                    li
+                                        a(href='/users/management')
+                                            | Users
+                                    li
+                                        a(href='/users/groups')
+                                            | Groups
+                                    li
+                                        a(href='/users/roles')
+                                            | Roles        
+                                            
+                                    li.iconbar-header.sub-header Confinement
+                                    li
+                                        a(href='ionic-icon.html')
+                                            | Ionic icon
+                            
+                            li
+                                a.bar-icons(href='javascript:void(0)')
+                                    i.icofont.icofont-server
+                                    span Hosts
+                                ul.iconbar-mainmenu.custom-scrollbar
+                                    li.iconbar-header Manage
+                                    li
+                                        a(href='/hosts/management')
+                                            | Hosts
+                                    li
+                                        a(href='/hosts/hostgroups')
+                                            | Host Groups        
+                                                            
+                            li
+                                //span.badge.badge-pill.badge-danger Access
+                                a.bar-icons(href='javascript:void(0)')
+                                    i.pe-7s-safe
+                                    span Access
+                                ul.iconbar-mainmenu.custom-scrollbar
+                                    li.iconbar-header Access
+                                    li
+                                        a(href='/access/users')
+                                            | Grant User
+                                    li
+                                        a(href='/access/groups')
+                                            | Grant Groups
+                                    li
+                                        a(href='/access/compliance')
+                                            | Compliance
+                                   
+                                                   
+
+// Page Sidebar Ends

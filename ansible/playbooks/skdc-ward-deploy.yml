@@ -1,0 +1,26 @@
+###############################################################################
+#
+# Deploy client
+#
+###############################################################################
+
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: "copying source file..."
+    template:
+      src: ../templates/skdc-ward-deploy/skdc-ward.go
+      dest: /tmp/skdc-ward.go
+
+  - name: "Installing required packcages"
+    shell: go get github.com/lucabodd/go-ldap-client
+
+  - name: "building sources"
+    shell: go build -o /usr/sbin/skdc-ward /tmp/skdc-ward.go
+
+  - name: "removing python files"
+    file:
+      path: /tmp/skdc-ward.go
+      state: absent

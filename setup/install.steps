@@ -1,0 +1,69 @@
+1 - install node
+curl -sL https://deb.nodesource.com/setup_13.x | bash -
+apt-get install -y nodejs
+
+2 _ install npm modules
+cd $SKDC_DIR
+npm init
+
+3 - install mongo
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
+
+3 - add mongo indexes
+init-db.js comments
+
+3 - install ldap libraries and golang
+apt-get install libldap2-dev uuid-dev slapd golang
+
+4 - disable slapd systemctl
+
+5 - systemctl disable slapd.service
+
+6 - install golang modules
+su - skdc.app
+go get github.com/sevlyar/go-daemon
+cd /var/www/SKDC/daemons/
+go build skdcd.go
+
+6 - /etc/ansible/ansible.cfg
+[defaults]
+host_key_checking = False
+
+8 - /var/run/SKDC /var/log/SKDC dir and grant permission to user
+
+9 - create skdc webapp service file
+[Unit]
+Description=SKDC frontend service
+After=network.target
+
+[Service]
+Type=simple
+User=20025
+Group=20025
+Restart=always
+RestartSec=1
+ExecStart=/usr/bin/node /var/www/SKDC/app.js
+
+[Install]
+WantedBy=multi-user.target
+
+10 - create skdc controller daemon service file according to skdc dir
+[Unit]
+Description=SKDC daemon service
+
+[Service]
+Type=forking
+RuntimeDirectory=SKDC/
+User=20025
+Group=20025
+PIDFile=/var/run/SKDC/skdcd.pid
+ExecStart=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json
+ExecStop=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s quit
+ExecReload=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s reload
+SendSIGHUP=yes
+
+[Install]
+WantedBy=multi-user.target
+
+10 - configure mongodb admin user
+https://docs.mongodb.com/manual/tutorial/enable-authentication/

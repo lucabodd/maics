@@ -1,0 +1,32 @@
+###############################################################################
+#
+# Deploy config and reload ssh
+#
+###############################################################################
+
+---
+- hosts: all
+  become: yes
+  handlers:
+  - name: restart ssh
+    service:
+        name: ssh
+        state: reloaded
+
+  tasks:
+  - name: check for skdc client installed
+    stat:
+        path: /usr/sbin/skdc-ward
+    register: deployed
+
+  - name:
+    fail:
+        msg: "CLI-UNDEPLOYED : skdc client not deployed, click to deploy"
+    when: not deployed.stat.exists
+
+  - name: "Deploying sshd_config file..."
+    template:
+      src: ../templates/sshd-config-deploy/sshd_config
+      dest: /etc/ssh/sshd_config
+    notify:
+      - restart ssh

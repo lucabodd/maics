@@ -1,0 +1,16 @@
+###############################################################################
+#
+# Deploy ssh key
+#
+###############################################################################
+
+---
+- hosts: all
+  become: no
+
+  tasks:
+  - name: Set authorized key taken from file
+    authorized_key:
+        user: "{{skdc_user}}"
+        state: present
+        key: "{{ lookup('file', '/home/{{skdc_user}}/.ssh/id_rsa.pub') }}"

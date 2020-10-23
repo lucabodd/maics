@@ -1,0 +1,36 @@
+# Server Setup
+Port {{port}}
+LogLevel INFO
+Banner none
+PidFile /var/run/sshd.pid
+PrintLastLog yes
+PrintMotd no
+AcceptEnv LANG LC_*
+AcceptEnv TERM
+UsePAM yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding no
+PermitUserEnvironment no
+
+#Channel setup
+Ciphers aes192-cbc,aes256-cbc,aes192-ctr,aes256-ctr,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+ClientAliveInterval 179
+ClientAliveCountMax 5
+Compression yes
+
+#Authentication setup
+PermitRootLogin prohibit-password
+AuthenticationMethods publickey
+AuthorizedKeysCommand /usr/sbin/skdc-ward %u
+AuthorizedKeysCommandUser nobody
+AuthorizedKeysFile none  #fail secure
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+# override default of no subsystems
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+
+#Allowed users (SKDC deployed)
+AllowUsers {{ sshd_users }}

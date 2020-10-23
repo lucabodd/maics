@@ -1,0 +1,88 @@
+extends layouts/basic
+
+block title
+	title Documentation - SKDC
+
+block content
+	.app-title
+		div
+			h1
+				i.fa.fa-file-code-o
+				|  Documentation
+			p Documentation of SSH Key distribution center
+
+		ul.app-breadcrumb.breadcrumb
+			li.breadcrumb-item
+				i.fa.fa-home.fa-lg
+			li.breadcrumb-item
+				a(href='#') Documentation
+				
+	if role == 'admin'
+		.tile
+			.tile-body
+				.docs(style="max-width: 700px;")
+					h2.docs-title Documentation for admin users
+	.tile
+		.tile-body
+			.docs(style="max-width: 700px;")
+				h2.docs-title Errors
+				p Here's documentation about errors that may occurr due to users incorrect actions. If you landed here means you followed the "why am I getting this error?" link
+				| Application may experience errors and generate error codes, each char of the code has a special meaning:
+				ul
+					li First character: Describes the main object of the error, such as
+						ul
+							li D (Database): Means an error occurred while connecting or performing queryes to the database
+							li S (SKDC): Means the application encountered an issue due to user input
+					li Second character: Describes the component that is generating the error, for example:
+						ul
+							li D #[b M]: Describes an issue with MongoDB
+							li D #[b L]: Describes an issue with LDAP
+							li D #[b A]: Describes an issue with a query that involves both LDAP and MongoDB Databases
+							li S #[b ?]: Indicates the specific SKDC route that is generating the issue
+					li First digit: Left blank for possible future usage
+					li Second digit: progressive integer that identifies an high level error, such as LDAP authentication failed
+					li Third digit: progressive integer that identifies a lower level error such as query error, or indicates an "overflow" for the second digit in cases when the error is intrinsecally linked to high level issues (such as S?[0-9][0-9][0-9] ones)
+					
+	.tile
+		.tile-body
+			.docs(style="max-width: 700px;")
+				h2.docs-title Error Codes
+				p Generally you will be directed automatically to one of the following error codes:
+				
+				h2.docs-title#DM001 Error DM001
+				p Connection to MongoDB has been successfully established but no query can be performed. This might be caused by various issue, such as data inconsistency e.g. (User deleted via LDAP without using SKDC), unexpected null value passed to query, or duplicate key error. Generally, this error should fix by itself, if this error persist you should check database status.
+				
+				h2.docs-title#DL001 Error DL001
+				p Connecrion to LDAP has been successfully established but no modification can be performed. This might be caused by various issue, such as: LDAP schema errors, bind errors ect. Generally this kind of error should not occur, if it does check the LDAP connection paramenters in config.json and check that custom shema attributes (sshPublicKey) is loaded in LDAP.
+
+				h2.docs-title#DL010 Error DL010
+				p Connection to LDAP has been successfully established but bind failed. This might be caused by unexisting username/unmatching password binds. frequently, this error occurs when user did not inserted the correct 'Old password' in password change procedure.
+				
+				h2.docs-title#DA001 Error DA001
+				p Asynchronous query that involves both LDAP and MongoDB failed and service cannot determinate which of those generated the error. This might be caused by various issue, such as data inconsistency e.g. (User deleted via LDAP and not in SKDC) or unexpected null value passed to query. Generally, this error should fix by itself, if this error persist you should check databases (LDAP and MongoDB) status.
+				
+				h2.docs-title#SG010 Error SG010
+				p User already added to to a group: User is trying to add an user to a group that has already joined previously
+				
+				h2.docs-title#SH010 Error SH010
+				p Host already added to to a cluster: user is trying to add an host to a cluster that has already joined previously
+				
+				h2.docs-title#SH020 Error SH020
+				p Cannot automatically deploy skdc client to host. in this cases access management won't be controlled by SKDC till this error is solved. Tipically this error is related to an ansible problem, check app.log to find more informations about this issue or, if problem persist try to deploy the client manually.
+				
+				h2.docs-title#SK010 Error SK010
+				p User insered a vrong OTP key. Verification failed. If this problem persists, please ask your system administrator to delete the OTP secret. You will be requested toscan a new QR code.
+
+				h2.docs-title#SK010 Error SK010
+				p User insered a vrong OTP key. Verification failed. If this problem persists, please ask your system administrator to delete the OTP secret. You will be requested toscan a new QR code.
+
+				h2.docs-title#SL010 Error SL010
+				p Error in password change procedure: 'New password' and 'Confirm New password' fields mismatch, try again.
+				
+				h2.docs-title#SL020 Error SL020
+				p Error in password change procedure: New password is equal as the old one.
+				
+				h2.docs-title#SL030 Error SL030
+				p Error in password change procedure: Password did not met the minimum requirements.
+				
+				

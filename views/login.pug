@@ -1,0 +1,74 @@
+- var login                 = true;
+
+doctype html
+html(lang='en')
+    include ../components/header-files
+    body
+        include ../components/loader
+        // page-wrapper Start
+        .page-wrapper
+          .container-fluid.p-0
+            // login page start
+            .authentication-main
+              .row
+                .col-md-12
+                  .auth-innerright
+                    .authentication-box
+                        .card-body.p-0
+                          .cont.text-center
+                            div 
+                                form.theme-form(method='POST' action='/utils/auth')
+                                  h4 LOGIN
+                                  br
+                                  h6 Enter your Username and Password
+                                  br
+                                  br
+                                  .form-group
+                                    label.col-form-label.pt-0 Username
+                                    input.form-control(type='text', placeholder='name.surname' name='sys_username')
+                                  .form-group
+                                    label.col-form-label Password
+                                    input.form-control(type='password' placeholder='password' name='password')
+                                  br
+                                  if unauth
+                                      .alert.alert-dark.dark.alert-dismissible.fade.show(role='alert')
+                                          strong Failed! 
+                                          p  Login failed, check your username/password again.
+                                          button.close(type='button', data-dismiss='alert', aria-label='Close')
+                                              span(aria-hidden='true') &times;
+
+
+                                  .form-group.form-row.mt-3.mb-0
+                                    button.btn.btn-primary.btn-block(type='submit') LOGIN
+                                    
+                            .sub-cont
+                              .img
+                                .img__text.m--up
+                                  h2 Forgot Password?
+                                  p Click below and we'll help you get back on track
+                                .img__text.m--in
+                                  h2 One of us?
+                                  p If you already have an account, and you can remember your password just sign in!
+                                .img__btn
+                                  span.m--up Forgot Password
+                                  span.m--in Sign in
+                              div
+                                form.theme-form(action="/password-reset" method="POST")
+                                  h4 FORGOT PASSWORD
+                                  br
+                                  br
+                                  h6 Enter your Username for Password Reset
+                                  br
+                                  br
+                                  .form-group
+                                    label.col-form-label.pt-0 Username
+                                    input.form-control(type='text', placeholder='name.surname' name='sys_username')
+                                  br
+                                  .form-group.form-row.mt-3.mb-0
+                                      button.btn.btn-primary.btn-block(type='submit') RESET
+
+                                   
+                                
+
+            // login page end
+        include ../components/footer-files

@@ -1,0 +1,70 @@
+- var select2               = true;
+- var page_select2          = true;
+- var sidebar_open          = true;
+- var sweetalert2           = true;
+- var err_handling          = true;
+- var pe7_icon              = true;
+- var datatable             = true;
+- var page_datatable        = true;
+- var popover_custom        = true;
+- var form_wizard_three     = true;
+
+doctype html
+html(lang='en')
+    include ../../components/header-files
+    //pincodeInput
+    link(rel='stylesheet', type='text/css', href='../../assets/css/bootstrap-pincode-input.css')
+    body
+        include ../../components/loader
+        // page-wrapper Start
+        .page-wrapper
+            include ../../components/header
+            // Page Body Start
+            .page-body-wrapper
+                include ../../components/sidebar
+                .page-body
+                    .container-fluid
+                        .page-header
+                            .row
+                                .col-lg-6.main-header
+                                    h2
+                                      | Compliance
+                                    h6.mb-0 Retrive informations about user access and more
+                                .col-lg-6.breadcrumb-right      
+                                    ol.breadcrumb
+                                      li.breadcrumb-item
+                                        a(href='/users/management')
+                                         i.pe-7s-home
+                                      li.breadcrumb-item.active users
+                    // Container-fluid starts
+                    .container-fluid
+                      .row
+                        .col-md-6
+                            .card.card-g-primary
+                              .card-header
+                                h5 Download Journal File
+                              .card-body
+                                p Here in MAICS each action performed by: users, technicians and administrators are tracked in a journal log file.
+                                p click the button below to download the journaling file.
+                                a.btn.btn-pill.btn-light(href="/utils/download-journal")
+                                    i.fa.fa-download
+                                    | &nbsp; Download Journal File
+                        
+                        .col-md-6
+                            .card.card-g-primary
+                              .card-header
+                                h5 Download Access Matrix
+                              .card-body
+                                p Here in MAICS each action performed by: users, technicians and administrators are tracked in a journal log file.
+                                p click the button below to download the journaling file.
+                                a.btn.btn-pill.btn-light(href="/utils/download-journal")
+                                    i.fa.fa-download
+                                    | &nbsp; Download .xlsx File
+                                  
+                                
+                    // Container-fluid Ends
+                include ../../components/footer
+        include ../../components/footer-files
+
+            
+    

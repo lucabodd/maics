@@ -1,0 +1,33 @@
+{
+    "maics": {
+	"port": 443,
+        "user": "root",
+        "admin_mail": "ict@example.com",
+        "dir": "/var/www/MAICS/",
+        "log_dir" : "/var/log/maics/",
+        "run_dir" : "/var/run/maics/",
+        "SSL": {
+            "CERT": "/var/www/MAICS/ssl/https/certificate.pem",
+            "KEY": "/var/www/MAICS/ssl/https/key.pem"
+        }
+    },
+    "mongo": {
+        "url": "mongodb://localhost:27017/",
+        "instance": "MAICS"
+    },
+    "ldap": {
+        "uri": "ldaps://ldap.maics.com",
+        "TLS": {
+            "CA": "/var/www/MAICS/ssl/ldap/cacert.pem",
+            "KEY": "/var/www/MAICS/ssl/ldap/ldapserver-cert.crt",
+            "CERT": "/var/www/MAICS/ssl/ldap/ldapserver-key.key"
+        },
+        "base_dn": "dc=ldap,dc=maics,dc=com",
+        "bind_dn": "cn=maicsadm,dc=ldap,dc=maics,dc=com",
+        "bind_password": "oOmiac43",
+        "read_only_dn": "cn=maicsro,ou=users,dc=ldap,dc=maics,dc=com",
+        "read_only_password": "oOmiac43",
+        "users_ou": "people",
+        "groups_ou": "groups"
+    }
+}

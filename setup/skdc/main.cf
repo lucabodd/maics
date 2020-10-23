@@ -1,0 +1,82 @@
+#DEPLOYED BY ANSIBLE
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+localhostname=hqit-morfeo-01
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# disable weak protocols
+smtpd_tls_mandatory_protocols=!SSLv2,!SSLv3
+smtp_tls_mandatory_protocols=!SSLv2,!SSLv3
+smtpd_tls_protocols=!SSLv2,!SSLv3
+smtp_tls_protocols=!SSLv2,!SSLv3
+
+# if STARTTLS is present, use it!
+smtp_tls_security_level = may
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+
+myhostname = $localhostname.hqit.ubiquity.it
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination =  $localhostname, localhost.localdomain, localhost, $localhostname.hqit.ubiquity.it 
+
+# 20180604
+# relayhost = DO NOT USE THIS  
+# relayhost: GSuite puts internal mail in spam. Without using google as relay, also remote smtp put our email in spam
+# To avoid this situation, we must use smtp-relay for routing outgoing emails.
+# Using port 587 with STARTTLS for confidentiality.
+#
+# Due to problems with customers that use our platform to send email with a custom sender (i.e. "no_reply@plick.eu"),
+# we must differentiate relay host on sender base.
+# So: 
+# - if a mail is sent with a kaleyra/ubiquity domain in sender address, mail is routed through google
+# - if a mail is sent with any other domain in sender address, mail is routed from localhost, unless customer provided
+#   an appropriate login
+# ATTENTION: file is a regex map!!!
+sender_dependent_relayhost_maps = regexp:/etc/postfix/relay_by_sender.regexp
+
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_command = procmail -a "$EXTENSION"
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+inet_protocols = all
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated reject_unauth_destination
+
+# disabling VRFY as security measure
+disable_vrfy_command = yes
+
+# --------------------------------------------------------------------------
+# rate and concurrency limits for poor providers (e.g. libero.it/inwind.it)
+
+transport_maps = regexp:/etc/postfix/transport
+
+polite_destination_concurrency_limit = 2
+polite_initial_destination_concurrency = 1 
+polite_destination_rate_delay = 0
+polite_destination_recipient_limit = 5
+# --------------------------------------------------------------------------
+

@@ -1,0 +1,207 @@
+- var select2               = true;
+- var page_select2          = true;
+- var sidebar_open          = true;
+- var sweetalert2           = true;
+- var err_handling          = true;
+- var pe7_icon              = true;
+- var datatable             = true;
+- var page_datatable        = true;
+- var popover_custom        = true;
+- var form_wizard_three     = true;
+
+doctype html
+html(lang='en')
+    include ../../components/header-files
+    //pincodeInput
+    link(rel='stylesheet', type='text/css', href='../../assets/css/bootstrap-pincode-input.css')
+    body
+        include ../../components/loader
+        // page-wrapper Start
+        .page-wrapper
+            include ../../components/header
+            // Page Body Start
+            .page-body-wrapper
+                include ../../components/sidebar
+                .page-body
+                    .container-fluid
+                        .page-header
+                            .row
+                                .col-lg-6.main-header
+                                    h2
+                                      | Hosts
+                                    h6.mb-0 Manage hosts 
+                                .col-lg-6.breadcrumb-right      
+                                    ol.breadcrumb
+                                      li.breadcrumb-item
+                                        a(href='/users/management')
+                                         i.pe-7s-home
+                                      li.breadcrumb-item.active users
+                    // Container-fluid starts
+                    .container-fluid
+                      .row
+                        .col-sm-12
+                            .card
+                              .card-header
+                                h5 Add Host SSH Informations
+                              .card-body
+                                form.f1(method='POST' action='/utils/host-add')
+                                  .f1-steps
+                                    .f1-progress
+                                      .f1-progress-line(data-now-value='16.66', data-number-of-steps='3')
+                                    .f1-step.active
+                                      .f1-step-icon
+                                        i.icofont.icofont-server
+                                      p General Informations
+                                    .f1-step
+                                      .f1-step-icon
+                                        i.fa.fa-key
+                                      p SSH Informations
+                                    .f1-step
+                                      .f1-step-icon
+                                        i.fa.fa-users
+                                      p Optional Host Group
+                                  fieldset
+                                    .form-group
+                                      label(for='f1-hostname') Hostname:
+                                      input#f1-hostname.form-control(type='text', name='hostname', placeholder='Hostname...', required)
+                                    .form-group
+                                      label(for='f1-ip') IP Address:
+                                      input#f1-ip.f1-ip.form-control(type='text', name='ip', placeholder='IP Address...', required)
+                                    .f1-buttons
+                                      button.btn.btn-primary.btn-next(type='button') Next
+                                  fieldset
+                                    .form-group
+                                      label(for='f1-port') SSH Port:
+                                      input#f1-port.form-control(type='number', placeholder="Port..."  name='port' required)
+                                    .form-group
+                                        label(for='f1-proxy') SSH Proxy:
+                                        select#f1-proxy.js-example-basic-single(name="proxy" required style="width: 100%;")
+                                            option(value="none") None
+                                            if hosts
+                                                each val in hosts
+                                                    option(value=val.hostname)=val.hostname
+                                    .f1-buttons
+                                      button.btn.btn-primary.btn-previous(type='button') Previous
+                                      | &nbsp;
+                                      button.btn.btn-primary.btn-next(type='button') Next
+                                  fieldset
+                                     .form-group.select2-drpdwn
+                                         label(for='f1-groups') Add Host to Groups:
+                                         select.js-adduser-multiple(name="hostgroups" style="width: 100%;" multiple='multiple' required)
+                                             option(value="none") None
+                                             if hostgroups
+                                                 each val in hostgroups
+                                                     option(value=val.name)=val.name
+                                     .f1-buttons
+                                         button.btn.btn-primary.btn-previous(type='button') Previous
+                                         | &nbsp;
+                                         button.btn.btn-primary
+                                             i.fa.fa-plus 
+                                             | &nbsp; Add Host
+                                  
+                            .card
+                                .card-header
+                                    h5.card-title Hosts list
+                                .card-body
+                                        .table-responsive
+                                                table#basic-1.display
+                                                    thead
+                                                        tr
+                                                            th Hostname
+                                                            th IP
+                                                            th Port
+                                                            th Proxy
+                                                            th Hostgroups
+                                                            th Conn
+                                                            th Delete
+                                                    tbody
+                                                        if hosts
+                                                            each h in hosts
+                                                                tr
+                                                                    td=h.hostname
+                                                                    td=h.ip
+                                                                    td=h.port
+                                                                    td=h.proxy
+                                                                    td=h.hostgroups
+                                                                    if h.connection == 'TRUE'
+                                                                        td
+                                                                            button.btn.btn-success.fa.fa-plug(type='button' title='' data-container='body' data-toggle='popover' data-placement='left' data-content='Click to schedule skdc client update' data-original-title='Connected' onclick="deploy_confirm('"+h.hostname+"');")
+                                                                    else 
+                                                                        if h.connection == 'SUDOERR' 
+                                                                            td(style="width:  2%").mx-auto
+                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.error, data-original-title='Application user has not sudo access')
+                                                                                    i.fa.fa-plug
+                                                                        else if h.connection == 'EARLY-FAIL'
+                                                                            td(style="width:  2%").mx-auto
+                                                                                button.example-popover.btn.btn-danger(type='button', data-toggle='popover', data-placement='left', title='', data-content=h.error, data-original-title='Connection cannot be established')
+                                                                                    i.fa.fa-plug
+                                                                        else if h.connection == 'UNKNOWN'
+                                                                            td(style="width:  2%").mx-auto
+                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.error, data-original-title='Unknown error occurred')
+                                                                                    i.fa.fa-question
+                                                                        else if h.connection == 'CLI-UNDEPLOYED'
+                                                                            td(style="width:  2%").mx-auto           
+                                                                                button.example-popover.btn.btn-warning(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.error data-original-title='Client Undeployed' onclick="deploy_confirm('"+h.hostname+"');")
+                                                                                    i.icofont.icofont-social-dropbox
+                                                                    td(style="width:  2%;").mx-auto
+                                                                        button.btn.btn-danger.fa.fa-trash(onclick="confirm('"+h.hostname+"');")
+                  
+                                                    
+                            
+                    // Container-fluid Ends
+                include ../../components/footer
+        include ../../components/footer-files
+        script(type='text/javascript').
+            function confirm(host)
+            {
+                Swal.fire({
+                      title: 'Are you sure?',
+                      text: "You won't be able to revert this!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.value) {
+                    window.location.replace("/utils/host-delete?hostname=" + host);
+                  }
+                  else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Canceled',
+                        text: "Host elimination aborted.",
+                        icon: 'success',
+                        timer: 1000,
+                        timerProgressBar: true
+                      })
+                  }
+                })
+            }
+            function deploy_confirm(host)
+            {
+                Swal.fire({
+                      title: 'Are you sure?',
+                      text: "Once you deployed the client host will be under control of SKDC. only user defined in access management will be able to log in into this machine!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, deploy it!'
+                }).then((result) => {
+                  if (result.value) {
+                    window.location.replace("/utils/host-cli-deploy?hostname=" + host);
+                  }
+                  else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Canceled',
+                        text: "Client deployment aborted.",
+                        icon: 'success',
+                        timer: 1000,
+                        timerProgressBar: true
+                      })
+                  }
+                })
+            }
+
+            
+    

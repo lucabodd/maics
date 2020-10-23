@@ -1,0 +1,14 @@
+use MAICS
+db.createCollection("groups");
+db.createCollection("users");
+db.createCollection("hosts");
+db.createCollection("hostgroups");
+db.createCollection("access_groups");
+db.createCollection("access_users");
+//INDEXES
+db.users.createIndex( { "email": 1 }, { unique: true } );
+db.hosts.createIndex( { "hostname": 1 }, { unique: true } );
+db.groups.createIndex({ "name": 1 }, { unique: true })
+db.access_users.createIndex( { "hostname": 1, "email":1 }, { unique: true } );
+db.access_groups.createIndex( { "hostname": 1, "group":1 }, { unique: true } );
+db.hostgroups.createIndex( { "name": 1}, { unique: true } );

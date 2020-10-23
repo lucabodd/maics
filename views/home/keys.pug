@@ -1,0 +1,115 @@
+- var pe7_icon              = true;
+- var sidebar_open          = true;
+- var sweetalert2           = true;
+- var err_handling              = true;
+
+doctype html
+html(lang='en')
+    include ../../components/header-files
+    //pincodeInput
+    link(rel='stylesheet', type='text/css', href='../../assets/css/bootstrap-pincode-input.css')
+    body
+        include ../../components/loader
+        // page-wrapper Start
+        .page-wrapper
+            include ../../components/header
+            // Page Body Start
+            .page-body-wrapper
+                include ../../components/sidebar
+                .page-body
+                    .container-fluid
+                        .page-header
+                            .row
+                                .col-lg-6.main-header
+                                    h2
+                                      | SSH Keys
+                                      span
+                                        | Self-service
+                                    h6.mb-0 Manage your SSH keys
+                                .col-lg-6.breadcrumb-right      
+                                    ol.breadcrumb
+                                      li.breadcrumb-item
+                                        a(href='/home/keys')
+                                         i.pe-7s-home
+                                      li.breadcrumb-item.active keys
+                    // Container-fluid starts
+                    .container-fluid
+                      .row
+                        .col-sm-12
+                          .card
+                            .card-header
+                              h5 SSH keypair generation
+                              span
+                                | Please, use the following procedure to generate an RSA keypair:
+                                ul
+                                    li
+                                        i.fa.fa-caret-right.txt-secondary.m-r-10 
+                                        | #{sys_username}@localhost~> ssh-keygen -t rsa -b 4096 -C #{sys_username}
+                                    li 
+                                        i.fa.fa-caret-right.txt-secondary.m-r-10 
+                                        | Paste below the content of your id_rsa.pub or drag & drop id_rsa.pub file
+                            .card-body
+                                h5 Unlock SSH Public Key
+                                span To starting access server via ssh unlock your SSH Key using google Authenticator
+                                br
+                                br
+                                .row.justify-content-center
+                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
+                                        .form-group
+                                            input.form-control(type="text" name="otp" id="pincode-input")
+                            .card-body
+                                if pubKey
+                                    h5 Update your SSH key
+                                else
+                                    h5 Paste your SSH key
+                                
+                                if !key_lock
+                                    .col
+                                        form(action="/utils/key-upload", method="POST").form.form-theme
+                                            .form-group
+                                                textarea.form-control(name="pastedPubKey" rows="6")
+                                                    |#{pubKey}
+                                            .form-group
+                                                input(type="hidden" name="uid" value=sys_username)
+                                                button.btn.btn-pill.btn-primary(type="submit")
+                                                    if pubKey
+                                                        i.pe-7s-refresh
+                                                        | &nbsp;&nbsp; Update key
+                                                    else
+                                                        i.pe-7s-upload
+                                                        | &nbsp;&nbsp; Upload key
+                                else 
+                                    div.alert.alert-danger
+                                        b Key Locked! 
+                                        | Your key is locked, you won't be able to update key or login via ssh until you unlock your key via Authenticator OTP
+                    // Container-fluid Ends
+                include ../../components/footer
+        include ../../components/footer-files
+        script(src='../../assets/js/bootstrap-pincode-input.js')
+        script(type='text/javascript').
+            $('#pincode-input').pincodeInput({inputs:6,hidedigits:true,complete:function(value, e, errorElement){
+                  let timerInterval
+                  Swal.fire({
+                    title: 'Unlocking key!',
+                    text: 'processing...',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    onBeforeOpen: () => {
+                      swal.showLoading()
+                      timerInterval = setInterval(() => {
+                        const content = Swal.getContent()
+                        if (content) {
+                          const b = content.querySelector('b')
+                          if (b) {
+                            b.textContent = Swal.getTimerLeft()
+                          }
+                        }
+                      }, 100)
+                      window.location.replace("/utils/key-unlock?otp="+value);
+                    },
+                    onClose: () => {
+                      clearInterval(timerInterval)
+                    }
+                  })
+            }});
+        

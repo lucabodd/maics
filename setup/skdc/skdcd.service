@@ -1,0 +1,16 @@
+[Unit]
+Description=SKDC daemon service
+
+[Service]
+Type=forking
+RuntimeDirectory=SKDC/
+User=20025
+Group=20025
+PIDFile=/var/run/SKDC/skdcd.pid
+ExecStart=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json
+ExecStop=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s quit
+ExecReload=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s reload
+SendSIGHUP=yes
+
+[Install]
+WantedBy=multi-user.target
