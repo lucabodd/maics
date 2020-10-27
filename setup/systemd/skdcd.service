@@ -4,8 +4,8 @@ Description=SKDC daemon service
 [Service]
 Type=forking
 RuntimeDirectory=SKDC/
-User=20025
-Group=20025
+User=0
+Group=0
 PIDFile=/var/run/SKDC/skdcd.pid
 ExecStart=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json
 ExecStop=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s quit
