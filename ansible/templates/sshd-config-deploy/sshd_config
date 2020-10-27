@@ -1,5 +1,5 @@
 # Server Setup
-Port {{maics_ssh_port}}
+Port {{ maics_ssh_port }}
 LogLevel INFO
 Banner none
 PidFile /var/run/sshd.pid
@@ -33,5 +33,4 @@ ChallengeResponseAuthentication no
 Subsystem       sftp    /usr/lib/openssh/sftp-server
 
 #access deployed by MAICS
-AllowUsers {{ sshd_users }}
-AllowGroups {{ sshd_groups }}
+{{ sshd_allow_block }}
