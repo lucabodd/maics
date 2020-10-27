@@ -6,6 +6,7 @@
 
 ---
 - hosts: all
+  gather_facts: no
   become: yes
   handlers:
   - name: restart ssh
