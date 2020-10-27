@@ -1,0 +1,12 @@
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.170 --vm-name maics-fw-01 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.171 --vm-name maics-fw-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.180 --vm-name maics-lb-01 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.181 --vm-name maics-lb-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.174 --vm-name maics-db-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.175 --vm-name maics-db-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.176 --vm-name maics-db-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.172 --vm-name maics-web-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.173 --vm-name maics-web-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.177 --vm-name maics-monitor-01 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.178 --vm-name maics-monitor-02 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
+ESXi-vm-deploy --esxi hqit-vrt-06 --helper hqit-morfeo-01 --vm-ip 10.60.0.179 --vm-name maics-monitor-03 --vm-ram 1  --vm-disk-size 5 --vm-cpu 2
