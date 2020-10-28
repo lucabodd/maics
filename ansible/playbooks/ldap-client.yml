@@ -1,0 +1,90 @@
+    ###############################################################################
+    #
+    # Install ldap client on remote host and connect it to  MAICS ldap
+    #
+    ###############################################################################
+
+---
+- hosts: all
+  tasks:
+    - name: Update repositories cache and install libnss-ldap libpam-ldap ldap-utils packages
+      apt:
+        name:
+        - python-apt
+        - libnss-ldap
+        - libpam-ldap
+        - ldap-utils
+        update_cache: yes
+
+    - name: "Creating ssl directory"
+      file:
+        path: /etc/ldap/ssl
+        state: directory
+        mode: 0755
+
+    - name: "installing ssl certificates"
+      template:
+        src: "{{ ldap_ca }}"
+        dest: /etc/ldap/ssl/cacert.pem
+
+    - name: "ldap: configuring ldap.conf"
+      template:
+        src: ../templates/ldap-client/ldap.conf
+        dest: /etc/ldap/ldap.conf
+
+    - name: "ldap: configuring libnss-ldap.conf"
+      template:
+        src: ../templates/ldap-client/libnss-ldap.conf
+        dest: /etc/libnss-ldap.conf
+        mode: 0600
+
+    - name: "ldap: installing libnss-ldap.secret"
+      template:
+        src: ../templates/ldap-client/libnss-ldap.secret
+        dest: /etc/libnss-ldap.secret
+        mode: 0600
+
+    - name: "ldap: configuring pam_ldap.conf"
+      template:
+        src: ../templates/ldap-client/pam_ldap.conf
+        dest: /etc/pam_ldap.conf
+        mode: 0600
+
+    - name: "ldap: configuring pam.d/common-auth"
+      template:
+        src: ../templates/ldap-client/common-auth
+        dest: /etc/pam.d/common-auth
+
+    - name: "ldap: configuring pam.d/common-account"
+      template:
+        src: ../templates/ldap-client/common-account
+        dest: /etc/pam.d/common-account
+
+    - name: "Replace use_authok in /etc/pam.d/common-password"
+      replace:
+        path: /etc/pam.d/common-password
+        regexp: 'use_authtok'
+        replace: ''
+
+    - name: pam session configuration /etc/pam.d/common-session
+      lineinfile:
+        path: /etc/pam.d/common-session
+        line: 'session optional pam_mkhomedir.so skel=/etc/skel umask=077'
+
+    - name: Edit nssswitch.conf - passwd
+      lineinfile:
+        path: /etc/nsswitch.conf
+        regexp: '^passwd:'
+        line: 'passwd:          compat ldap'
+
+    - name: Edit nssswitch.conf - group
+      lineinfile:
+        path: /etc/nsswitch.conf
+        regexp: '^group:'
+        line: 'group:          compat ldap'
+
+    - name: Edit nssswitch.conf - shadow
+      lineinfile:
+        path: /etc/nsswitch.conf
+        regexp: '^shadow:'
+        line: 'shadow:          compat ldap'
