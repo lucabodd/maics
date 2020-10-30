@@ -25,7 +25,7 @@
         "base_dn": "dc=ldap,dc=maics,dc=com",
         "bind_dn": "cn=maicsadm,dc=ldap,dc=maics,dc=com",
         "bind_password": "oOmiac43",
-        "read_only_dn": "cn=maicsro,ou=users,dc=ldap,dc=maics,dc=com",
+        "read_only_dn": "cn=maicsro,dc=ldap,dc=maics,dc=com",
         "read_only_password": "oOmiac43",
         "users_ou": "people",
         "groups_ou": "groups"

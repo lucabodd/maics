@@ -29,8 +29,8 @@ router.post('/host-add', function (req, res, next) {
         port: req.body.port,
         hostgroups: req_hostgroups.join(" "),
         proxy: req.body.proxy,
-        connection: "EARLY-FAIL",
-        error: "" //detail of connection error - string is base64 encoded
+        connection: "unreachable",
+        connection_detail: "Pending connection ..." //detail of connection error - string is base64 encoded
     };
 
     mdb.connect(mongo_instance)
@@ -68,7 +68,7 @@ router.get('/host-cli-deploy', function (req, res, next) {
         mdb.connect(mongo_instance)
         .then(
             function(){
-                mdb.updDocument("hosts", {hostname: host}, {$set: {deploy_req: "SYN"}})
+                mdb.updDocument("hosts", {hostname: host}, {$set: {deploy_req: "SYN", connection: "deploy-req", connection_detail: "Deploying maics-ward. Please wait ..." }})
                 .then(
                     function(){
                         log('[+] User '+req.session.email+' requested client deploy for host'+host, app_log);

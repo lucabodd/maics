@@ -43,20 +43,6 @@ router.get('/management', function (req, res, next) {
                     Promise.all([hosts, hostCount, clusters])
                         .then(
                             function (value) {
-                                value[0].forEach(function(host){
-                                    if("error" in host)
-                                    {
-                                        if(host.error != "")
-                                        {
-                                            b64_decoded_err = Buffer.from(host.error, 'base64').toString();
-                                            json_err = JSON.parse(b64_decoded_err);
-                                            //successful connection
-                                            if(json_err.plays[0].tasks[0].hosts[host.hostname].unreachable==undefined)
-                                                json_err.plays[0].tasks[0].hosts[host.hostname].unreachable=false
-                                            host.error = "Message: "+json_err.plays[0].tasks[0].hosts[host.hostname].msg+"<br>Unreachable: "+json_err.plays[0].tasks[0].hosts[host.hostname].unreachable+"<br>Start Time: "+json_err.plays[0].tasks[0].task.duration.start+"<br>End Time:"+json_err.plays[0].tasks[0].task.duration.end;
-                                        }
-                                    }
-                                });
                                 res.render('hosts-management', {
                                     hosts: value[0],
                                     host_count: value[1],

@@ -22,7 +22,7 @@ Compression yes
 #Authentication setup
 PermitRootLogin prohibit-password
 AuthenticationMethods publickey
-AuthorizedKeysCommand /usr/sbin/skdc-ward %u
+AuthorizedKeysCommand /usr/sbin/maics-ward %u
 AuthorizedKeysCommandUser nobody
 AuthorizedKeysFile none  #fail secure
 PasswordAuthentication no

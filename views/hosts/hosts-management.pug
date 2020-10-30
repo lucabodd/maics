@@ -123,26 +123,34 @@ html(lang='en')
                                                                     td=h.port
                                                                     td=h.proxy
                                                                     td=h.hostgroups
-                                                                    if h.connection == 'TRUE'
+                                                                    if h.connection == 'true'
                                                                         td
-                                                                            button.btn.btn-success.fa.fa-plug(type='button' title='' data-container='body' data-toggle='popover' data-placement='left' data-content='Click to schedule skdc client update' data-original-title='Connected' onclick="deploy_confirm('"+h.hostname+"');")
+                                                                            button.example-popover.btn.btn-success.fa.fa-plug(type='button' title='' data-container='body' data-toggle='popover' data-html="true", data-placement='left' data-content=h.connection_detail, data-original-title='Connected' onclick="deploy_confirm('"+h.hostname+"');")
                                                                     else 
-                                                                        if h.connection == 'SUDOERR' 
+                                                                        if h.connection == 'unreachable' 
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.error, data-original-title='Application user has not sudo access')
+                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Host '+h.hostname+' is not reachable via SSH port '+h.port)
                                                                                     i.fa.fa-plug
-                                                                        else if h.connection == 'EARLY-FAIL'
+                                                                        if h.connection == 'unauthorized' 
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-danger(type='button', data-toggle='popover', data-placement='left', title='', data-content=h.error, data-original-title='Connection cannot be established')
-                                                                                    i.fa.fa-plug
-                                                                        else if h.connection == 'UNKNOWN'
+                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Root account is not authorized to log in '+ h.hostname)
+                                                                                    i.fa.fa-ban
+                                                                        if h.connection == 'proxy-refuse' 
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.error, data-original-title='Unknown error occurred')
+                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Host is not reachable via SSH port '+h.port)
+                                                                                    i.fa.fa-chain-broken
+                                                                        else if h.connection == 'unknown'
+                                                                            td(style="width:  2%").mx-auto
+                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Unknown error occurred')
                                                                                     i.fa.fa-question
-                                                                        else if h.connection == 'CLI-UNDEPLOYED'
+                                                                        else if h.connection == 'maics-ward-undeployed'
                                                                             td(style="width:  2%").mx-auto           
-                                                                                button.example-popover.btn.btn-warning(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.error data-original-title='Client Undeployed' onclick="deploy_confirm('"+h.hostname+"');")
+                                                                                button.example-popover.btn.btn-warning(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.connection_detail data-original-title='Client Undeployed' onclick="deploy_confirm('"+h.hostname+"');")
                                                                                     i.icofont.icofont-social-dropbox
+                                                                        else if h.connection == 'deploy-req'
+                                                                            td(style="width:  2%").mx-auto           
+                                                                                button.example-popover.btn.btn-success(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.connection_detail data-original-title='Deploying Client')
+                                                                                    i.fa.fa-spin.fa-spinner
                                                                     td(style="width:  2%;").mx-auto
                                                                         button.btn.btn-danger.fa.fa-trash(onclick="confirm('"+h.hostname+"');")
                   

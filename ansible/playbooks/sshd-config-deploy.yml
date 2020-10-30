@@ -21,7 +21,7 @@
 
   - name:
     fail:
-        msg: "maics-client-undeployed : maics client not deployed, click to deploy"
+        msg: "maics-ward-undeployed : maics client not deployed, click to deploy"
     when: not deployed.stat.exists
 
   - name: "Deploying sshd_config file..."
