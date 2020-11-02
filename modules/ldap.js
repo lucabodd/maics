@@ -256,7 +256,7 @@ LDAP.prototype.modPwd = function (uid, pwd)
                                 userPassword: hashes.ldap,
                             }
                         });
-                        client.modify("cn="+uid+","+_this.ldap_base_users, change,function(err) {
+                        client.modify("uid="+uid+","+_this.ldap_base_users, change,function(err) {
                             if(err){
                                 reject(err);
                             }

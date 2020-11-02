@@ -125,7 +125,7 @@ router.post("/password-reset", function (req,res,next) {
                                  transporter.sendMail(message, (error, info) => {
                                     if (error) {
                                         log('[-] LDAP password has been resetted but mail to '+user.email+' could not be sent, reason: '+err.message, app_log);
-                                        res.render('error', {
+                                        res.render('error-500', {
                                             message: "500",
                                             error: {status: "Service Unvailable", detail: "Server cannot send mail"}
                                         });
@@ -139,7 +139,7 @@ router.post("/password-reset", function (req,res,next) {
                             },
                             function (err) {
                                 log('[*] cannot modify LDAP password unser might not exist, reason: '+err.message, app_log);
-                                res.render('error', {
+                                res.render('error-500', {
                                     message: "500",
                                     error: {status: "Service Unvailable", detail: "Server cannot handle your request"}
                                 });
@@ -178,7 +178,7 @@ router.post("/password-reset", function (req,res,next) {
                 },
                 function(err){
                     log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                    res.render('error-500',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
                 }
             );
         },
