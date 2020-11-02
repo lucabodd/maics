@@ -12,8 +12,12 @@ https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
 3 - add mongo indexes
 init-db.js comments
 
-3 - install ldap libraries and golang
-apt-get install libldap2-dev uuid-dev slapd golang
+3 - install ldap libraries and golang, python3-pip
+apt-get install libldap2-dev uuid-dev slapd golang python3-pip
+
+4 - install pymongo
+pip3 install pymongo
+pip3 install openpyxl
 
 4 - disable slapd systemctl
 
