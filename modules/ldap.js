@@ -131,7 +131,7 @@ LDAP.prototype.searchGroup = function(srcOpt)
     });
 }
 
-LDAP.prototype.modKey = function (uid, pubKey)
+LDAP.prototype.modKey = function (uid, sshPublicKey)
 {
     var _this = this
     return new Promise(function(resolve, reject){
@@ -147,7 +147,7 @@ LDAP.prototype.modKey = function (uid, pubKey)
                 var change = new ldap.Change({
                     operation: 'replace',
                     modification: {
-                        sshPublicKey: pubKey
+                        sshPublicKey: sshPublicKey
                     }
                 });
                 client.modify("uid="+uid+","+_this.ldap_base_users, change,function(err) {

@@ -2,7 +2,7 @@
     "maics": {
 	    "port": 443,
         "user": "root",
-        "admin_mail": "ict@example.com",
+        "admin_mail": "appliance@mail.maics.com",
         "dir": "/var/www/MAICS/",
         "log_dir" : "/var/log/maics/",
         "run_dir" : "/var/run/maics/",

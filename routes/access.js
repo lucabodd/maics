@@ -45,7 +45,7 @@ router.get('/users', function(req, res, next) {
                             sys_username: 1,
                             role: 1,
                             group: 1,
-                            pubKey: 1
+                            sshPublicKey: 1
                     });
                     var groups = mdb.findManyDocuments("groups", {});
                     var access = mdb.findManyDocuments("access_users", {});
@@ -92,7 +92,7 @@ router.get('/groups', function(req, res, next) {
                             sys_username: 1,
                             role: 1,
                             group: 1,
-                            pubKey: 1
+                            sshPublicKey: 1
                     });
                     var groups = mdb.findManyDocuments("groups", {});
                     var access = mdb.findManyDocuments("access_groups", {});

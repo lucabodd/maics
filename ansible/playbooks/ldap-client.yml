@@ -24,7 +24,7 @@
 
     - name: "installing ssl certificates"
       template:
-        src: "{{ ldap_ca }}"
+        src: "{{ ldap_tls_ca }}"
         dest: /etc/ldap/ssl/cacert.pem
 
     - name: "ldap: configuring ldap.conf"
@@ -88,3 +88,13 @@
         path: /etc/nsswitch.conf
         regexp: '^shadow:'
         line: 'shadow:          compat ldap'
+
+    - name: stop nscd
+      service:
+        name: nscd
+        state: stopped
+
+    - name: start nscd
+      service:
+        name: nscd
+        state: started

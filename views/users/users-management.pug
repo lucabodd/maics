@@ -140,9 +140,9 @@ html(lang='en')
                                                                                 i.fa.fa-unlock
                                                                     
                                                                     //key status
-                                                                    if u.pubKey 
+                                                                    if u.sshPublicKey 
                                                                         td(style="width:  2%").mx-auto
-                                                                            button.example-popover.btn.btn-success(type='button', data-toggle='popover', data-placement='left', title='' data-content=u.pubKey, data-original-title='SSH User key')
+                                                                            button.example-popover.btn.btn-success(type='button', data-toggle='popover', data-placement='left', title='' data-content=u.sshPublicKey, data-original-title='SSH User key')
                                                                                 i.fa.fa-check-circle
                                                                     else
                                                                         td(style="width:  2%").mx-auto
@@ -155,7 +155,7 @@ html(lang='en')
                                                                             div.dropdown-menu(aria-labelledby="dropdownMenuButton")
                                                                                 h6.dropdown-header Account Actions
                                                                                 div.dropdown-divider
-                                                                                if u.pubKey
+                                                                                if u.sshPublicKey
                                                                                     button.dropdown-item.btn.btn-light.txt-dark(onclick="location.href='/utils/delete-key?sys_username=" + u.sys_username + "&email="+ u.email +"'" style="border-radius: 0px;") Delete SSH public key
                                                                                 else
                                                                                     button.dropdown-item.btn.btn-light(disabled style="border-radius: 0px;") User SSH public key not set

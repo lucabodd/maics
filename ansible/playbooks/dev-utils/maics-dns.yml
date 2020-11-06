@@ -1,0 +1,30 @@
+---
+- hosts: all
+  tasks:
+    - name: comment
+      lineinfile:
+        path: /etc/hosts
+        line: '##### maics old school DNS (Testing) #####'
+        state: present
+        insertafter: EOF
+
+    - name: add ldap hostname
+      lineinfile:
+        path: /etc/hosts
+        line: '10.60.0.75       ldap.maics.com'
+        state: present
+        insertafter: EOF
+
+    - name: add appliance hostname
+      lineinfile:
+        path: /etc/hosts
+        line: '10.60.0.190      appliance.maics.com'
+        state: present
+        insertafter: EOF
+
+    - name: add mail hostname
+      lineinfile:
+        path: /etc/hosts
+        line: '10.60.0.183      mail.maics.com'
+        state: present
+        insertafter: EOF

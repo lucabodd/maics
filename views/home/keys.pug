@@ -58,7 +58,7 @@ html(lang='en')
                                         .form-group
                                             input.form-control(type="text" name="otp" id="pincode-input")
                             .card-body
-                                if pubKey
+                                if sshPublicKey
                                     h5 Update your SSH key
                                 else
                                     h5 Paste your SSH key
@@ -68,11 +68,11 @@ html(lang='en')
                                         form(action="/utils/key-upload", method="POST").form.form-theme
                                             .form-group
                                                 textarea.form-control(name="pastedPubKey" rows="6")
-                                                    |#{pubKey}
+                                                    |#{sshPublicKey}
                                             .form-group
                                                 input(type="hidden" name="uid" value=sys_username)
                                                 button.btn.btn-pill.btn-primary(type="submit")
-                                                    if pubKey
+                                                    if sshPublicKey
                                                         i.pe-7s-refresh
                                                         | &nbsp;&nbsp; Update key
                                                     else

@@ -52,7 +52,7 @@ router.get('/keys', function (req, res, next) {
                                     sys_username: value.sys_username,
                                     role: value.role,
                                     groups: value.group,
-                                    pubKey: value.pubKey,
+                                    sshPublicKey: value.sshPublicKey,
                                     key_lock: req.session.key_lock,
                                     code: req.query.code,
                                     error: err

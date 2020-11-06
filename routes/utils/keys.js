@@ -51,7 +51,7 @@ router.get('/key-unlock', function (req, res, next) {
         mdb.connect(mongo_instance)
         .then(
             function(value){
-                mdb.findDocument("users", {email: req.session.email}, {sys_username: 1, email: 1, otp_secret: 1, key_last_unlock: 1, pubKey:1})
+                mdb.findDocument("users", {email: req.session.email}, {sys_username: 1, email: 1, otp_secret: 1, key_last_unlock: 1, sshPublicKey:1})
                     .then(
                         function(user){
                             var verified = speakeasy.totp.verify({
@@ -80,16 +80,16 @@ router.get('/key-unlock', function (req, res, next) {
                                             else{
                                                 log("[+] SKDC is decripting "+req.session.email+" key", app_log);
                                                 //user first unlock
-                                                if(user.pubKey == undefined)
+                                                if(user.sshPublicKey == undefined)
                                                 {
                                                     log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
                                                     res.redirect("/home/keys?error=false");
                                                 }
-                                                else if(user.pubKey.indexOf("ssh-rsa") == -1)
+                                                else if(user.sshPublicKey.indexOf("ssh-rsa") == -1)
                                                 {
                                                     var key = Buffer.from(base32Decode(user.otp_secret, 'RFC4648'), 'HEX').toString();
-                                                    const decKey = aes_256_cfb.AESdecrypt(key, user.pubKey);
-                                                    mdb.updDocument("users", {sys_username: user.sys_username}, { $set: { pubKey: decKey }})
+                                                    const decKey = aes_256_cfb.AESdecrypt(key, user.sshPublicKey);
+                                                    mdb.updDocument("users", {sys_username: user.sys_username}, { $set: { sshPublicKey: decKey }})
                                                         .then(
                                                                 function(){
                                                                     ldap.modKey(user.sys_username, decKey)
@@ -167,14 +167,14 @@ router.get('/key-save-otp-secret', function (req, res, next) {
 });
 
 router.post('/key-upload', function (req, res, next) {
-        var pubKey = req.body.pastedPubKey;
+        var sshPublicKey = req.body.pastedPubKey;
         var email = req.session.email;
         var uid = req.body.uid;
                 mdb.connect(mongo_instance)
                     .then(
                         function () {
-                            p1 = mdb.updDocument("users", {"email": email}, {$set: { pubKey: pubKey }})
-                            p2 = ldap.modKey(uid, pubKey)
+                            p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: sshPublicKey }})
+                            p2 = ldap.modKey(uid, sshPublicKey)
                             Promise.all([p1, p2])
                                 .then(
                                     function () {

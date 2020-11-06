@@ -28,7 +28,7 @@ router.get('/management', function (req, res, next) {
         mdb.connect(mongo_instance)
             .then(
                 function () {
-                    var users = mdb.findManyDocuments("users", {}, {name: 1, surname: 1, email: 1, group: 1, role: 1, sys_username:1, pwdAccountLockedTime:1, pubKey:1, otp_secret: 1 });
+                    var users = mdb.findManyDocuments("users", {}, {name: 1, surname: 1, email: 1, group: 1, role: 1, sys_username:1, pwdAccountLockedTime:1, sshPublicKey:1, otp_secret: 1 });
                     var userCount = mdb.countCollectionItems("users");
                     var groups = mdb.findManyDocuments("groups", {});
                     Promise.all([users, userCount, groups])

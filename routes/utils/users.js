@@ -48,8 +48,7 @@ router.post('/user-add', function (req, res, next) {
         sys_username: req.body.uid,
         role: req.body.user_role,
         group: req_groups.join(" "),
-        password: undefined,
-        pubKey: undefined,
+        sshPublicKey: undefined,
         pwdChangedTime: ztime.current(),
         pwdAccountLockedTime: null,
         key_last_unlock: "19700101000010Z"
@@ -68,8 +67,7 @@ router.post('/user-add', function (req, res, next) {
             .then(
                 function (value) {
                     //Deleting attributes to add user in group members
-                    delete document.password;
-                    delete document.pubKey;
+                    delete document.sshPublicKey;
                     delete document.group;
                     delete document.pwdChangedTime;
                     delete document.pwdAccountLockedTime;
@@ -144,93 +142,6 @@ router.post('/user-add', function (req, res, next) {
 });
 
 
-/* GET ldap-sync
-* sync local mongo users with LDAP
-*/
-router.get('/ldap-sync', function (req, res, next) {
-    ldap.search({ scope: 'sub', filter: '(uid=*)', attributes: ['mail','cn','userPassword','sshPublicKey', 'pwdChangedTime', 'pwdAccountLockedTime']})
-        .then(
-            function(ldap_rset){
-                mdb.connect(mongo_instance)
-                .then(
-                    function () {
-                        var ctr = 0;
-                        ldap_rset.forEach(function (ldap_user) {
-                            ldap.getUserGroups(ldap_user.cn)
-                                .then(
-                                    function(groups){
-                                        ctr++;
-                                        console.log(ctr);
-                                        fullname = ldap_user.cn.split(".");
-                                        var document = {
-                                            email: ldap_user.mail,
-                                            name: fullname[0].charAt(0).toUpperCase() + fullname[0].slice(1),
-                                            surname: fullname[1].charAt(0).toUpperCase() + fullname[1].slice(1),
-                                            sys_username: ldap_user.cn,
-                                            role: "user",
-                                            groups: groups.join(" "),
-                                            password: ldap_user.userPassword,
-                                            pubKey: ldap_user.sshPublicKey,
-                                            pwdChangedTime: ldap_user.pwdChangedTime,
-                                            pwdAccountLockedTime: ldap_user.pwdAccountLockedTime
-                                        };
-                                        mdb.addDocument("users", document)
-                                        .then(
-                                            function()
-                                            {
-                                                log("[+] User "+document.email+" synced from LDAP by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                                log("[+] User "+document.email+" insered successfully on LDAP and MongoDB by: "+req.session.email, app_log);
-                                            },
-                                            //if user is not present try to update the below fields
-                                            function(err)
-                                            {
-                                                //could merge in one query
-                                                p1 = mdb.updDocument("users", {"email": document.email}, {$set: {"password": document.password}})
-                                                p2 = mdb.updDocument("users", {"email": document.email}, {$set: {"pubKey": document.pubKey}})
-                                                p3 = mdb.updDocument("users", {"email": document.email}, {$set: {"pwdChangedTime": document.pwdChangedTime}})
-                                                p4 = mdb.updDocument("users", {"email": document.email}, {$set: {"pwdAccountLockedTime": document.pwdAccountLockedTime}})
-                                                p5 = mdb.updDocument("users", {"email": document.email}, {$set: {"group": document.groups}})
-                                                Promise.all([p1, p2, p3, p4])
-                                                .then(
-                                                    function(succ){
-                                                        if(succ.nModified > 0){
-                                                            log("[+] User "+document.email+" updated in specified timestamp from LDAP by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                                            log("[+] User "+document.email+" updated by: "+req.session.email, app_log);
-                                                        }
-                                                        else {
-                                                            log("[-] User "+document.email+"not updated, can't detect any change ", app_log);
-                                                        }
-                                                    },
-                                                    function(err){
-                                                        log('[-] Connection cannot update MongoDB or LDAP, reason: '+err.message, app_log);
-                                                    }
-                                                );
-                                            }
-                                        );
-                                    },
-                                    function(err){
-                                        log('[-] Connection to LDAP cannot be established, reason: '+err.message, app_log);
-                                    }
-                                );
-                        });
-                        if(ctr === ldap_rset.length)
-                        {
-                            res.redirect('/users/management?error=false');
-                        }
-                    },
-                    function (err){
-                        log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-                        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                    }
-                );
-            },
-            function (err) {
-                log('[-] Connection to LDAP cannot be established, reason: '+err.message, app_log);
-                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-            }
-        );
-});
-
 /* GET update-keys
 * add new user in DB
 * This method generate ssh key-pair and update user entry
@@ -242,7 +153,7 @@ var email = req.query.email;
 mdb.connect(mongo_instance)
 .then(
 function () {
-    p1 = mdb.updDocument("users", {"email": email}, {$set: { pubKey: undefined }})
+    p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: undefined }})
     p2 = ldap.modKey(uname, "")
     Promise.all([p1, p2])
     .then(
@@ -325,65 +236,58 @@ router.get('/user-delete', function (req, res, next) {
 * lock user in ldap
 */
 router.get('/user-lock', function (req, res, next) {
-    if(req.session.email == undefined){
-        log("[*] Non logged user is trying to get host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
-        res.render('login', {unauth: false});
-    }
-    else if (req.session.role != "admin") {
-        log("[*] Non admin user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
-        res.status(403)
-        res.render('error', {
-            message: "403",
-            error: {status: "Forbidden", detail: "You are not authorized to see this page"}
-        });
-    }
-    else {
         var uname = req.query.sys_username;
         var email = req.query.email;
         ldap.lockAccount(uname)
         .then(
             function () {
-                log("[+] User "+email+" locked in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                log("[+] User "+email+" locked by: "+req.session.email, app_log);
-                res.redirect('/utils/ldap-sync');
+                mdb.connect(mongo_instance)
+                .then(
+                    function(){
+                        mdb.updDocument("users",{"sys_username": uname}, { "$set": {"pwdAccountLockedTime": ztime.current()}})
+                        log("[+] User "+email+" locked in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                        log("[+] User "+email+" locked by: "+req.session.email, app_log);
+                        res.redirect('/users/management?error=false');
+                    },
+                    function(err){
+                        log('[-] Connection cannot update LDAP, reason: '+err.message, app_log);
+                        res.redirect('/users/management?error=true&code=\'DL001\'');
+                    }
+                );
             },
             function (err) {
                 log('[-] Connection cannot update LDAP, reason: '+err.message, app_log);
                 res.redirect('/users/management?error=true&code=\'DL001\'');
             }
         );
-    }
 });
 
 router.get('/user-unlock', function (req, res, next) {
-    if(req.session.email == undefined){
-        log("[*] Non logged user is trying to get host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
-        res.render('login', {unauth: false});
-    }
-    else if (req.session.role != "admin") {
-        log("[*] Non admin user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
-        res.status(403)
-        res.render('error', {
-            message: "403",
-            error: {status: "Forbidden", detail: "You are not authorized to see this page"}
-        });
-    }
-    else {
         var uname = req.query.sys_username;
         var email = req.query.email;
         ldap.unlockAccount(uname)
         .then(
             function () {
-                log("[+] User "+email+" unlocked in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                log("[+] User "+email+" unlocked by: "+req.session.email, app_log);
-                res.redirect('/utils/ldap-sync');
+                mdb.connect(mongo_instance)
+                .then(
+                    function(){
+                        mdb.updDocument("users",{"sys_username": uname}, { "$set": {"pwdAccountLockedTime":""}})
+                        log("[+] User "+email+" unlocked in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                        log("[+] User "+email+" unlocked by: "+req.session.email, app_log);
+                        res.redirect('/users/management?error=false');
+                    },
+                    function(err){
+                        log('[-] Connection cannot update LDAP, reason: '+err.message, app_log);
+                        res.redirect('/users/management?error=true&code=\'DL001\'');
+                    }
+                )
+
             },
             function (err) {
                 log('[-] Connection cannot update LDAP, reason: '+err.message, app_log);
                 res.redirect('/users/management?error=true&code=\'DL001\'');
             }
         );
-    }
 });
 
 module.exports = router;
