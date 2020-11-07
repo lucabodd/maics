@@ -10,8 +10,11 @@
   become_method: "{{ 'sudo' if sudo is defined else 'su' }}"
 
   tasks:
+  - name: retriveing root public key for maics
+    shell: "cat /home/{{maics_user}}/.ssh/id_rsa.pub"
+    delegate_to: localhost
+    register: id_rsa_pub
+
+
   - name: Set authorized key
-    authorized_key:
-        user: root
-        state: present
-        key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+    shell: "echo '{{id_rsa_pub.stdout}}' > /root/.ssh/authorized_keys"

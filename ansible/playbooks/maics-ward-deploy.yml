@@ -16,7 +16,7 @@
         update_cache: yes
 
   - name: retriveing root public key for maics
-    shell: cat /root/.ssh/id_rsa.pub
+    shell: "cat /home/{{maics_user}}/.ssh/id_rsa.pub"
     delegate_to: localhost
     register: id_rsa_pub
 

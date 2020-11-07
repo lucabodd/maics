@@ -20,6 +20,7 @@ const exec = require('child_process').exec
 
 //ansible
 const maics_dir = config.maics.dir
+const maics_user = config.maics.user
 
 router.post('/host-add', function (req, res, next) {
     var req_hostgroups = req.body.hostgroups;
@@ -126,19 +127,19 @@ router.post('/deploy-ssh-key', function (req, res, next) {
         //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" ansible_become_pass="Nab2Blim!" su=true'
         //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" sudo=true'
 
-        base_command="ansible-playbook -i "+hostname+", "+maics_dir+"ansible/playbooks/ssh-copy-id.yml -u ";
+        base_command="export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i "+hostname+", "+maics_dir+"ansible/playbooks/ssh-copy-id.yml -u ";
         //auth with su
         if(username!="" && password!="" && root_password!=""){
-            command = base_command+username+" -e 'ansible_ssh_pass=\""+password+"\" ansible_become_pass=\""+root_password+"\" su=true'"
+            command = base_command+username+" -e 'maics_user=\""+maics_user+"\" ansible_ssh_pass=\""+password+"\" ansible_become_pass=\""+root_password+"\" su=true'"
         }
         //auth with sudo
         else if (username!="" && password!=""){
-            command = base_command+username+" -e 'ansible_ssh_pass=\""+password+"\" sudo=true'"
+            command = base_command+username+" -e 'maics_user=\""+maics_user+"\" ansible_ssh_pass=\""+password+"\" sudo=true'"
 
         }
         //auth as root
         else if (root_password!=""){
-            command = base_command+"root -e 'ansible_ssh_pass=\""+root_password+"\"'"
+            command = base_command+"root -e 'maics_user=\""+maics_user+"\" ansible_ssh_pass=\""+root_password+"\"'"
         }
         else{
             res.redirect('/hosts/management?error=true&code=\'DM001\'');
