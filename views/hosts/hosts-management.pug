@@ -133,7 +133,7 @@ html(lang='en')
                                                                                     i.fa.fa-plug
                                                                         if h.connection == 'unauthorized' 
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Root account is not authorized to log in '+ h.hostname)
+                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Root account is not authorized to log in '+ h.hostname, onclick="copy_id('"+h.hostname+"');")
                                                                                     i.fa.fa-ban
                                                                         if h.connection == 'proxy-refuse' 
                                                                             td(style="width:  2%").mx-auto
@@ -151,6 +151,11 @@ html(lang='en')
                                                                             td(style="width:  2%").mx-auto           
                                                                                 button.example-popover.btn.btn-success(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.connection_detail data-original-title='Deploying Client')
                                                                                     i.fa.fa-spin.fa-spinner
+                                                                        else if h.connection == 'login-check'
+                                                                            td(style="width:  2%").mx-auto           
+                                                                                button.example-popover.btn.btn-success(type='button' title='' data-container='body' data-toggle='popover' data-html="true" data-placement='left' data-content=h.connection_detail data-original-title='Checking Authorization')
+                                                                                    i.fa.fa-spin.fa-spinner
+                                                                                    
                                                                     td(style="width:  2%;").mx-auto
                                                                         button.btn.btn-danger.fa.fa-trash(onclick="confirm('"+h.hostname+"');")
                   
@@ -210,6 +215,36 @@ html(lang='en')
                   }
                 })
             }
+            function copy_id(host)
+            {
+                Swal.fire({
+                  title: 'SSH credentials',
+                  html: `<p> Provide valid credentials able to edit /root/.ssh/authorized_key file. <br> if only user credentials are providen \"become\" method used will be sudo, if user/root is providen \"become\" method used will be su.<br> If login as root is allowed just type root password <\p>
+                            <input type="text" id="username" class="swal2-input" placeholder="Username">
+                            <input type="password" id="password" class="swal2-input" placeholder="Password">
+                            <input type="password" id="root_password" class="swal2-input" placeholder="Root Password">`,
+                  confirmButtonText: 'Deploy MAICS key',
+                  focusConfirm: false,
+                  preConfirm: () => {
+                    const username = Swal.getPopup().querySelector('#username').value
+                    const password = Swal.getPopup().querySelector('#password').value
+                    const root_password = Swal.getPopup().querySelector('#root_password').value
+                    if (!username && !password && !root_password) {
+                      Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
+                    }
+                    return { username: username, password: password, root_password: root_password }
+                  }
+                }).then((result) => {
+                    var form = $(`<form action="/utils/deploy-ssh-key" method="post">` +
+                                  `<input type="hidden" name="hostname" value="`+host+`">` +
+                                  `<input type="hidden" name="username" value="`+result.value.username+`">` +
+                                  `<input type="hidden" name="password" value="`+result.value.password+`">` +
+                                  `<input type="hidden" name="root_password" value="`+result.value.root_password+`"></form>`);
+                    $('body').append(form);
+                    form.submit();
+                })
+            }
+                
 
             
     

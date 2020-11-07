@@ -3,13 +3,13 @@
 	    "port": 443,
         "user": "root",
         "admin_mail": "appliance@mail.maics.com",
-        "dir": "/var/www/MAICS/",
+        "dir": "/var/www/maics/",
         "log_dir" : "/var/log/maics/",
         "run_dir" : "/var/run/maics/",
         "ssh_key_lifetime": 32400,
         "SSL": {
-            "CERT": "/var/www/MAICS/ssl/https/certificate.pem",
-            "KEY": "/var/www/MAICS/ssl/https/key.pem"
+            "CERT": "/var/www/maics/ssl/https/certificate.pem",
+            "KEY": "/var/www/maics/ssl/https/key.pem"
         }
     },
     "mongo": {
@@ -19,9 +19,9 @@
     "ldap": {
         "uri": "ldaps://ldap.maics.com",
         "TLS": {
-            "CA": "/var/www/MAICS/ssl/ldap/cacert.pem",
-            "KEY": "/var/www/MAICS/ssl/ldap/ldapserver-cert.crt",
-            "CERT": "/var/www/MAICS/ssl/ldap/ldapserver-key.key"
+            "CA": "/var/www/maics/ssl/ldap/cacert.pem",
+            "KEY": "/var/www/maics/ssl/ldap/ldapserver-cert.crt",
+            "CERT": "/var/www/maics/ssl/ldap/ldapserver-key.key"
         },
         "base_dn": "dc=ldap,dc=maics,dc=com",
         "bind_dn": "cn=maicsadm,dc=ldap,dc=maics,dc=com",

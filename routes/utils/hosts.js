@@ -18,6 +18,9 @@ const app_log = config.maics.log_dir+"app.log"
 //process spawning
 const exec = require('child_process').exec
 
+//ansible
+const maics_dir = config.maics.dir
+
 router.post('/host-add', function (req, res, next) {
     var req_hostgroups = req.body.hostgroups;
     if(!( req_hostgroups instanceof Array)){
@@ -111,6 +114,65 @@ router.get('/host-delete', function (req, res, next) {
                         )
                 }
             )
+});
+
+router.post('/deploy-ssh-key', function (req, res, next) {
+        var username = req.body.username;
+        var password = req.body.password;
+        var root_password = req.body.root_password;
+        var hostname = req.body.hostname;
+
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u root -e 'ansible_ssh_pass="Nab2Blim!"'
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" ansible_become_pass="Nab2Blim!" su=true'
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" sudo=true'
+
+        base_command="ansible-playbook -i "+hostname+", "+maics_dir+"ansible/playbooks/ssh-copy-id.yml -u ";
+        //auth with su
+        if(username!="" && password!="" && root_password!=""){
+            command = base_command+username+" -e 'ansible_ssh_pass=\""+password+"\" ansible_become_pass=\""+root_password+"\" su=true'"
+        }
+        //auth with sudo
+        else if (username!="" && password!=""){
+            command = base_command+username+" -e 'ansible_ssh_pass=\""+password+"\" sudo=true'"
+
+        }
+        //auth as root
+        else if (root_password!=""){
+            command = base_command+"root -e 'ansible_ssh_pass=\""+root_password+"\"'"
+        }
+        else{
+            res.redirect('/hosts/management?error=true&code=\'DM001\'');
+        }
+        exec(command, (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log(`error: ${error.message}`);
+                res.redirect('/hosts/management?error=true&code=\'DM001\'');
+            }
+            else {
+                mdb.connect(mongo_instance)
+                .then(
+                    function(){
+                        mdb.updDocument("hosts", {hostname: hostname}, {$set: {connection: "login-check", connection_detail: "Logging in, please refresh page in a while ..." }})
+                        .then(
+                            function(){
+                                log('[+] User '+req.session.email+' requested client deploy for host'+host, app_log);
+                                res.redirect('/hosts/management?error=false');
+                            },
+                            function(err){
+                                log('[-] Connection to MongoDB has been established, but no query cannot be satisfied, reason: '+err.message, app_log);
+                                res.redirect('/hosts/management?error=true&code=\'DM001\'');
+                            }
+                        )
+                    },
+                    function(err){
+                        log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+                        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                    }
+                )
+                res.redirect('/hosts/management?error=false');
+            }
+        });
+
 });
 
 
