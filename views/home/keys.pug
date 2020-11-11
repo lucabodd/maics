@@ -48,15 +48,37 @@ html(lang='en')
                                     li 
                                         i.fa.fa-caret-right.txt-secondary.m-r-10 
                                         | Paste below the content of your id_rsa.pub or drag & drop id_rsa.pub file
-                            .card-body
+                          .card
+                            .card-header
                                 h5 Unlock SSH Public Key
-                                span To starting access server via ssh unlock your SSH Key using google Authenticator
-                                br
-                                br
-                                .row.justify-content-center
-                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
-                                        .form-group
-                                            input.form-control(type="text" name="otp" id="pincode-input")
+                                span To starting access server via ssh unlock your SSH Key verifying identity through all authentication steps setted up
+                            .card-body
+                                .row
+                                  .col-sm-6
+                                      .card
+                                        .card-header
+                                            h5 Google authenticator
+                                        .card-body
+                                                br
+                                                br
+                                                .row.justify-content-center
+                                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
+                                                        .form-group
+                                                            input.form-control(type="text" name="otp" id="pincode-input")
+                                    
+                                  .col-sm-6
+                                      .card
+                                        .card-header
+                                            h5 Hardware token
+                                        .card-body
+                                                br
+                                                br
+                                                .row.justify-content-center
+                                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
+                                                        .form-group
+                                                            input.form-control(type="text" name="otp" id="pincode-input")
+                            
+                          .card
                             .card-body
                                 if sshPublicKey
                                     h5 Update your SSH key

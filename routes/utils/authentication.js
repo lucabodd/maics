@@ -32,6 +32,10 @@ schema
 .has().not().spaces()                           // Should not have spaces
 .has().symbols()                                // Password must contain a symbol
 
+//UFA
+const u2f = require("u2f");
+const APP_ID = config.maics.url;
+
 
 /* GET home page. */
 /*********************************************
@@ -68,6 +72,7 @@ router.post('/auth', function(req, res, next){
                                 req.session.role = user.role;
                                 req.session.key_lock = true;
                                 req.session.cookie.expires = new Date(Date.now() + (15 * 60 * 1000));
+                                req.session.u2f = u2f.request(APP_ID);
                                 log('[+] User '+user.role+' '+req.session.email+' Authenticated Successfully from ip: '+req.ip.replace(/f/g, "").replace(/:/g, "")+' User Agent: '+req.get('User-Agent'), app_log);
                                 res.redirect('/home/password-change');
                             }

@@ -6,7 +6,7 @@ const HTTPS = require("https");
 const FS = require("fs");
 const session = require("express-session");
 
-const APP_ID = "https://maics.hqit.kaleyra.com";
+const APP_ID = "https://appliance.maics.com";
 
 var app = Express();
 

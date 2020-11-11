@@ -1,5 +1,6 @@
 {
     "maics": {
+        "url": "https://appliance.maics.com",
 	    "port": 443,
         "user": "maics",
         "admin_mail": "appliance@mail.maics.com",

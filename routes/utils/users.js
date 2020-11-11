@@ -51,7 +51,10 @@ router.post('/user-add', function (req, res, next) {
         sshPublicKey: undefined,
         pwdChangedTime: ztime.current(),
         pwdAccountLockedTime: null,
-        key_last_unlock: "19700101000010Z"
+        key_last_unlock: "19700101000010Z",
+        otp_secret: "",
+        token_publicKey: "",
+        token_keyHandle: ""
     };
 
     mdb.connect(mongo_instance)

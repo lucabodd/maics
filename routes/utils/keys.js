@@ -34,6 +34,9 @@ var ztime = new ZT();
 //Authenticator
 var speakeasy = require("speakeasy");
 
+//UFA
+const u2f = require("u2f");
+
 /**************************************
  *  Contain routes for user management*
  *  (See nav bar under item "User")   *
@@ -140,7 +143,7 @@ router.get('/key-unlock', function (req, res, next) {
         );
 });
 
-router.get('/key-save-otp-secret', function (req, res, next) {
+router.get('/key-enroll-otp-secret', function (req, res, next) {
         var secret = req.query.otp_secret;
         mdb.connect(mongo_instance)
             .then(
@@ -148,7 +151,6 @@ router.get('/key-save-otp-secret', function (req, res, next) {
                         mdb.updDocument("users", {email: req.session.email}, { $set: {otp_secret: secret }})
                             .then(
                                 function () {
-                                    // TODO 5 Add to ansible event queue (if user exists, update keys)
                                     log("[+] User "+req.session.email+" successfully saved OTP secret.", app_log);
                                     log("[+] User "+req.session.email+" successfully saved OTP secret at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
                                     res.redirect('/home/2fa?error=false');
@@ -164,6 +166,39 @@ router.get('/key-save-otp-secret', function (req, res, next) {
                         res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
                     }
             );
+});
+
+//Jquery method
+router.post('/key-enroll-token-secret', function (req, res, next) {
+        var registration = u2f.checkRegistration(req.session.u2f, JSON.parse(req.body.registerResponse));
+
+        if(!registration.successful) {
+            res.redirect('/home/2fa?error=true&code=\'DM001\'');
+        }
+        else {
+            mdb.connect(mongo_instance)
+                .then(
+                    function(){
+                        mdb.updDocument("users", {email: req.session.email}, { $set: {token_publicKey: registration.publicKey, token_keyHandle: registration.keyHandle }})
+                            .then(
+                                function () {
+                                    log("[+] User "+req.session.email+" successfully saved token secret.", app_log);
+                                    log("[+] User "+req.session.email+" successfully saved OTP secret at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                                    res.redirect('/home/2fa?error=false');
+                                },
+                                function (err){
+                                    log('[-] Connection cannot update key on MongoDB, reason: '+err.message, app_log);
+                                    res.redirect('/home/2fa?error=true&code=\'DM001\'');
+                                }
+                            );
+                    },
+                    function(err){
+                        log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+                        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                    }
+                );
+        }
+
 });
 
 router.post('/key-upload', function (req, res, next) {

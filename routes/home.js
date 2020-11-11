@@ -74,35 +74,31 @@ router.get('/2fa', function(req, res, next) {
         mdb.connect(mongo_instance)
         .then(
             function() {
-                mdb.findDocument("users", {email: req.session.email}, {otp_secret: 1})
+                mdb.findDocument("users", {email: req.session.email}, {otp_secret: 1, token_publicKey:1})
                 .then(
                     function(value){
-                        console.log(value)
-                        //if user has not otp_secret attribute generate the Secret
-                        if(!(value.hasOwnProperty('otp_secret')))
-                        {
-                            var secret = speakeasy.generateSecret({length: 32});
-                            QRCode.toDataURL(secret.otpauth_url.replace("SecretKey", req.session.email), function(err, image_data) {
-                                res.render('2fa', {
-                                    username: req.session.email,
-                                    role: req.session.role,
-                                    otp_secret: secret.base32,
-                                    otp_qr: image_data,
-                                    error: req.query.error
-                                });
-                            });
-                        }
-                        //user has otp_secret attribute, authenticator setup not shown
-                        else
-                        {
+                        var secret = speakeasy.generateSecret({length: 32});
+                        QRCode.toDataURL(secret.otpauth_url.replace("SecretKey", req.session.email), function(err, image_data) {
+                            //check if one of MFA is set
+                            if(value.otp_secret=="")
+                                otp_secret = secret.base32;
+                            else
+                                otp_secret = "true";
+                            if(value.token_publicKey=="")
+                                challenge = JSON.stringify(req.session.u2f)
+                            else
+                                challenge = "true";
+
                             res.render('2fa', {
                                 username: req.session.email,
                                 role: req.session.role,
-                                otp_secret: true,
-                                code: req.query.code,
+                                otp_secret: otp_secret,
+                                otp_qr: image_data,
+                                token_challenge: challenge,
+                                url: config.maics.url,
                                 error: req.query.error
                             });
-                        }
+                        });
                     }, function(err){
                         log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
                         res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});

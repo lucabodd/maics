@@ -63,6 +63,7 @@ router.get('/login', function(req, res, next) {
     req.session.role = undefined;
     req.session.key_lock = true;
     req.session.cookie.expires = new Date(Date.now());
+    req.session.u2f = undefined;
     res.render('login');
 });
 
