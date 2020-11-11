@@ -1,6 +1,7 @@
 - var pe7_icon              = true;
 - var sidebar_open          = true;
 - var sweetalert2           = true;
+- var u2f_api               = true;
 - var err_handling              = true;
 
 doctype html
@@ -37,7 +38,7 @@ html(lang='en')
                       .row
                         .col-sm-12
                           .card
-                            .card-header
+                            .card-header.card-body
                               h5 SSH keypair generation
                               span
                                 | Please, use the following procedure to generate an RSA keypair:
@@ -58,57 +59,93 @@ html(lang='en')
                                       .card
                                         .card-header
                                             h5 Google authenticator
+                                            span Insert below the OTP shown in google authenticator app
                                         .card-body
-                                                br
-                                                br
-                                                .row.justify-content-center
-                                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
-                                                        .form-group
-                                                            input.form-control(type="text" name="otp" id="pincode-input")
+                                            .row
+                                                .col-sm-2
+                                                    img(src="../../assets/images/gotp-mini.png")
+                                                .col-sm-10
+                                                    input(type="text" name="otp" id="pincode-input")
                                     
                                   .col-sm-6
                                       .card
                                         .card-header
                                             h5 Hardware token
+                                            span Insert registered token in a usb port and click the button below
                                         .card-body
-                                                br
-                                                br
-                                                .row.justify-content-center
-                                                    form(action="/utils/key-unlock", method="POST").form-theme.form-inline
-                                                        .form-group
-                                                            input.form-control(type="text" name="otp" id="pincode-input")
+                                            .row.justify-content-center
+                                                .p-10 
+                                                        img(src="../../assets/images/yubikey.png")
+                                            .row.justify-content-center
+                                                .p-10
+                                                        button.btn.btn-pill.btn-primary(id="verify-button")
+                                                            i.fa.fa-check
+                                                            | &nbsp;&nbsp;Verify Token
                             
                           .card
-                            .card-body
-                                if sshPublicKey
-                                    h5 Update your SSH key
-                                else
-                                    h5 Paste your SSH key
-                                
+                              .card-header
+                                  h5.card-title Request Key unlock
+                                  span Verify all the authentication factors above and click the button below
+                              .card-body
+                                  .row.justify-content-center
+                                      .col-md-8
+                                          form.form.theme-form
+                                              button.form-control.btn.btn-pill.btn-primary(id="verify-button")
+                                                  i.fa.fa-unlock
+                                                  | &nbsp;&nbsp;Request Key Unlock
+                                  
+                          .card
                                 if !key_lock
-                                    .col
-                                        form(action="/utils/key-upload", method="POST").form.form-theme
-                                            .form-group
-                                                textarea.form-control(name="pastedPubKey" rows="6")
-                                                    |#{sshPublicKey}
-                                            .form-group
-                                                input(type="hidden" name="uid" value=sys_username)
-                                                button.btn.btn-pill.btn-primary(type="submit")
-                                                    if sshPublicKey
-                                                        i.pe-7s-refresh
-                                                        | &nbsp;&nbsp; Update key
-                                                    else
-                                                        i.pe-7s-upload
-                                                        | &nbsp;&nbsp; Upload key
+                                    .card-header
+                                        if sshPublicKey
+                                            h5.card-title Update your SSH key
+                                        else
+                                            h5.card-title Paste your SSH key
+                                    .card-body
+                                        .col
+                                            form(action="/utils/key-upload", method="POST").form.form-theme
+                                                .form-group
+                                                    textarea.form-control(name="pastedPubKey" rows="6")
+                                                        |#{sshPublicKey}
+                                                .form-group
+                                                    input(type="hidden" name="uid" value=sys_username)
+                                                    button.btn.btn-pill.btn-primary(type="submit")
+                                                        if sshPublicKey
+                                                            i.pe-7s-refresh
+                                                            | &nbsp;&nbsp; Update key
+                                                        else
+                                                            i.pe-7s-upload
+                                                            | &nbsp;&nbsp; Upload key
                                 else 
-                                    div.alert.alert-danger
-                                        b Key Locked! 
-                                        | Your key is locked, you won't be able to update key or login via ssh until you unlock your key via Authenticator OTP
+                                    .card-header.card-body
+                                        div.alert.alert-danger
+                                            b Key Locked! 
+                                            | Your key is locked, you won't be able to edit key or login via ssh until you unlock your key 
                     // Container-fluid Ends
                 include ../../components/footer
         include ../../components/footer-files
         script(src='../../assets/js/bootstrap-pincode-input.js')
         script(type='text/javascript').
+            $("#verify-button").click(() => {
+                if(window.u2f && window.u2f.sign) {
+                    var decoded = $('<textarea />').html("#{sign_challenge}").text();
+                    var authRequest = JSON.parse(decoded);
+                        window.u2f.sign(authRequest.appId, authRequest.challenge, [authRequest], response => {
+                            $.post("#{url}", { loginResponse: response }, data => {
+                                if(data.errorCode) {
+                                    alert("U2F failed with error: " + data.errorCode);
+                                    return;
+                                }
+                            });
+                            var form = $('<form action="/utils/verify-token" method="post">' +
+                                          '<input type="hidden" name="loginResponse" value='+JSON.stringify(response)+'></form>');
+                            $('body').append(form);
+                            form.submit();
+                        });
+                } else {
+                    document.write("<p>U2F is not supported</p>");
+                }
+            });
             $('#pincode-input').pincodeInput({inputs:6,hidedigits:true,complete:function(value, e, errorElement){
                   let timerInterval
                   Swal.fire({
@@ -127,7 +164,7 @@ html(lang='en')
                           }
                         }
                       }, 100)
-                      window.location.replace("/utils/key-unlock?otp="+value);
+                      window.location.replace("/utils/verify-otp?otp="+value);
                     },
                     onClose: () => {
                       clearInterval(timerInterval)

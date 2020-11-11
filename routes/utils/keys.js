@@ -24,6 +24,9 @@ const journal_log = config.maics.log_dir+"journal.log"
 var AES_256_CFB = require("../../modules/aes-256-cfb");
 var aes_256_cfb = new AES_256_CFB();
 
+//crypt SHA-512
+var crypto = require('crypto');
+
 //Base 32 decode otp secret
 const base32Decode = require('base32-decode')
 
@@ -49,7 +52,7 @@ const u2f = require("u2f");
 
 
 
-router.get('/key-unlock', function (req, res, next) {
+router.get('/verify-otp', function (req, res, next) {
         var otp = req.query.otp;
         mdb.connect(mongo_instance)
         .then(
@@ -64,7 +67,69 @@ router.get('/key-unlock', function (req, res, next) {
                               token: otp
                             });
                             if(verified){
-                                req.session.key_lock = false;
+                                if(!req.session.otp_verified){
+                                    req.session.otp_verified = true;
+                                    var hash = crypto.createHash('sha512');
+                                    var plain_otp_secret = Buffer.from(base32Decode(user.otp_secret, 'RFC4648'), 'HEX').toString();
+                                    data = hash.update(plain_otp_secret+req.session.master_key, 'utf-8');
+                                    gen_hash= data.digest('hex');
+                                    console.log(gen_hash)
+                                    req.session.master_key = data;
+                                }
+                                res.redirect("/home/keys?error=false");
+                            }
+                            else {
+                                res.redirect("/home/keys?error=true&code=\'SK010\'");
+                            }
+                        },
+                        function(err){
+                            log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                        }
+                    );
+            },
+            function(err){
+                log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+            }
+        );
+});
+
+router.post('/verify-token', function (req, res, next) {
+    mdb.connect(mongo_instance)
+    .then(
+        function(){
+            mdb.findDocument("users", {email: req.session.email})
+            .then(
+                function(user){
+                    success = u2f.checkSignature(req.session.u2f, JSON.parse(req.body.loginResponse), user.token_publicKey);
+                    if(success.successful){
+                        req.session.otp_verified = true;
+                        var hash = crypto.createHash('sha512');
+                        data = hash.update(user.token_publicKey+req.session.master_key, 'utf-8');
+                        gen_hash= data.digest('hex');
+                        console.log(gen_hash)
+                        req.session.master_key = data;
+                        res.redirect("/home/keys?error=false");
+                    }
+                    else{
+                        res.redirect("/home/keys?error=true&code=\'SK010\'");
+                    }
+                },
+                function(err){
+                    log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                }
+            )
+        },
+        function(err){
+            log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+        }
+    );
+});
+
+                                /*
                                 mdb.updDocument("users", {email: req.session.email}, {$set: { key_last_unlock: ztime.current() }})
                                     .then(
                                         function(){
@@ -141,7 +206,7 @@ router.get('/key-unlock', function (req, res, next) {
                 res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
             }
         );
-});
+});*/
 
 router.get('/key-enroll-otp-secret', function (req, res, next) {
         var secret = req.query.otp_secret;

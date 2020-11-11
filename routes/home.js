@@ -19,6 +19,10 @@ const app_log = config.maics.log_dir+"app.log"
 var speakeasy = require("speakeasy");
 var QRCode = require('qrcode');
 
+//UFA
+const u2f = require("u2f");
+const APP_ID = config.maics.url;
+
 /* GET home page. */
 /*********************************************
 *  Routes here are defined under             *
@@ -45,6 +49,14 @@ router.get('/keys', function (req, res, next) {
                     mdb.findDocument("users", { email: req.session.email })
                         .then(
                             function (value) {
+                                //parse enabled methods
+                                if (value.otp_secret == "" && !value.otp_enabled)
+                                    req.session.otp_verified = true
+                                if (value.token_publicKey == "" && !value.otp_enabled)
+                                    req.session.token_verified = true
+                                if (value.token_keyHandle)
+                                    req.session.u2f = u2f.request(APP_ID, value.token_keyHandle);
+
                                 res.render('keys', {
                                     name: value.name,
                                     surname: value.surname,
@@ -53,7 +65,9 @@ router.get('/keys', function (req, res, next) {
                                     role: value.role,
                                     groups: value.group,
                                     sshPublicKey: value.sshPublicKey,
+                                    sign_challenge: JSON.stringify(req.session.u2f),
                                     key_lock: req.session.key_lock,
+                                    url: config.maics.url,
                                     code: req.query.code,
                                     error: err
                                 });
