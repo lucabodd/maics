@@ -131,14 +131,6 @@ router.post('/verify-token', function (req, res, next) {
 
 
 router.post('/key-unlock', function (req, res, next) {
-    //test
-    var hash = crypto.createHash('sha512');
-    data = hash.update(req.session.otp_secret_hash+req.session.token_secret_hash, 'utf-8');
-    gen_hash= data.digest('hex');
-    console.log("OTP hash: "+req.session.otp_secret_hash)
-    console.log("TKN hash: "+req.session.token_secret_hash)
-    console.log("HASHSUM: "+gen_hash)
-
     mdb.connect(mongo_instance)
     .then(
         function(){
@@ -170,9 +162,6 @@ router.post('/key-unlock', function (req, res, next) {
                                             var hash = crypto.createHash('sha512');
                                             data = hash.update(req.session.otp_secret_hash+req.session.token_secret_hash, 'utf-8');
                                             gen_hash= data.digest('hex');
-                                            console.log("OTP hash:"+req.session.otp_secret_hash)
-                                            console.log("TKN hash:"+req.session.token_secret_hash)
-                                            console.log("HASHSUM: "+gen_hash)
 
                                             const decKey = aes_256_cfb.AESdecrypt(gen_hash, user.sshPublicKey);
                                             mdb.updDocument("users", {sys_username: user.sys_username}, { $set: { sshPublicKey: decKey }})
