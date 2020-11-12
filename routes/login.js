@@ -59,12 +59,15 @@ const transporter = nodemailer.createTransport({
 /* GET login page
 * when unauth users go to MAICS lands on this page*/
 router.get('/login', function(req, res, next) {
+    //deallocate session vars
     req.session.email = undefined;
     req.session.role = undefined;
     req.session.key_lock = true;
     req.session.cookie.expires = new Date(Date.now());
     req.session.otp_verified = false;
     req.session.token_verified = false;
+    req.session.otp_secret_hash = "";
+    req.session.token_secret_hash = "";
     req.session.u2f = undefined;
     res.render('login');
 });

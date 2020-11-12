@@ -56,6 +56,8 @@ html(lang='en')
                             .card-body
                                 .row
                                   .col-sm-6
+                                     //GOTP CASES
+                                     if !otp_verified && otp_enabled
                                       .card
                                         .card-header
                                             h5 Google authenticator
@@ -66,8 +68,39 @@ html(lang='en')
                                                     img(src="../../assets/images/gotp-mini.png")
                                                 .col-sm-10
                                                     input(type="text" name="otp" id="pincode-input")
-                                    
+                                     else if otp_verified 
+                                      .card
+                                        .card-header
+                                            h5 Google Authenticator
+                                            span You successfully verified your identity via OTP
+                                        .card-body
+                                            .row.justify-content-center
+                                                .p-10 
+                                                        img(src="../../assets/images/gotp-verified.png")
+                                            .row.justify-content-center
+                                                .p-10
+                                                        button.btn.btn-pill.btn-success(disabled)
+                                                            i.pe-7s-like2
+                                                            | &nbsp;&nbsp;OTP Verified
+                                             
+                                     else if !otp_enabled 
+                                      .card
+                                        .card-header
+                                            h5 Google Authenticator
+                                            span Administrator disabled google authenticator for #{sys_username}
+                                        .card-body
+                                            .row.justify-content-center
+                                                .p-10 
+                                                        img(src="../../assets/images/gotp-disabled.png")
+                                            .row.justify-content-center
+                                                .p-10
+                                                        button.btn.btn-pill.btn-danger(disabled)
+                                                            i.pe-7s-like2
+                                                            | &nbsp;&nbsp;OTP Disabled                   
+                                  //end of GOTP cases
+                                  //Hardware token verification status
                                   .col-sm-6
+                                     if !token_verified && token_enabled
                                       .card
                                         .card-header
                                             h5 Hardware token
@@ -81,18 +114,58 @@ html(lang='en')
                                                         button.btn.btn-pill.btn-primary(id="verify-button")
                                                             i.fa.fa-check
                                                             | &nbsp;&nbsp;Verify Token
-                            
+                                     else if token_verified 
+                                      .card
+                                        .card-header
+                                            h5 Hardware token verified
+                                            span You successfully verified your identity via hardware token
+                                        .card-body
+                                            .row.justify-content-center
+                                                .p-10 
+                                                        img(src="../../assets/images/yubikey-verified.png")
+                                            .row.justify-content-center
+                                                .p-10
+                                                        button.btn.btn-pill.btn-success(disabled)
+                                                            i.pe-7s-like2
+                                                            | &nbsp;&nbsp;Token Verified
+                                     else if !otp_enabled 
+                                      .card
+                                        .card-header
+                                            h5 Token Disabled
+                                            span Administrator disabled token authentication for #{sys_username}
+                                        .card-body
+                                            .row.justify-content-center
+                                                .p-10 
+                                                        img(src="../../assets/images/yubikey-disabled.png")
+                                            .row.justify-content-center
+                                                .p-10
+                                                        button.btn.btn-pill.btn-danger(disabled)
+                                                            i.pe-7s-like2
+                                                            | &nbsp;&nbsp;Token Disabled  
                           .card
-                              .card-header
-                                  h5.card-title Request Key unlock
-                                  span Verify all the authentication factors above and click the button below
-                              .card-body
-                                  .row.justify-content-center
-                                      .col-md-8
-                                          form.form.theme-form
-                                              button.form-control.btn.btn-pill.btn-primary(id="verify-button")
-                                                  i.fa.fa-unlock
-                                                  | &nbsp;&nbsp;Request Key Unlock
+                              if key_lock
+                                if key_verified==key_enabled && otp_verified==otp_enabled
+                                      .card-header
+                                          h5.card-title Request Key unlock
+                                          span You successfully verified all authentication factors, now you can unlock the key
+                                      .card-body
+                                          .row.justify-content-center
+                                              .col-md-8
+                                                  form(action="/utils/key-unlock" method="post").form.theme-form
+                                                      button.form-control.btn.btn-pill.btn-primary
+                                                          i.fa.fa-unlock
+                                                          | &nbsp;&nbsp;Request Key Unlock
+                                else
+                                      .card-header
+                                          h5.card-title Verify authentication factors 
+                                          span You need to verify all the authentication factors above before being able to request a key unlock.
+                                      .card-body
+                                          .row.justify-content-center
+                                              .col-md-8
+                                                  form.form.theme-form
+                                                      button.form-control.btn.btn-pill.btn-danger(disabled)
+                                                          i.fa.fa-lock
+                                                          | &nbsp;&nbsp;Request Key Unlock
                                   
                           .card
                                 if !key_lock
@@ -107,15 +180,17 @@ html(lang='en')
                                                 .form-group
                                                     textarea.form-control(name="pastedPubKey" rows="6")
                                                         |#{sshPublicKey}
-                                                .form-group
-                                                    input(type="hidden" name="uid" value=sys_username)
-                                                    button.btn.btn-pill.btn-primary(type="submit")
-                                                        if sshPublicKey
-                                                            i.pe-7s-refresh
-                                                            | &nbsp;&nbsp; Update key
-                                                        else
-                                                            i.pe-7s-upload
-                                                            | &nbsp;&nbsp; Upload key
+                                                .row.justify-content-center
+                                                    .form-group
+                                                        input(type="hidden" name="uid" value=sys_username)
+                                                        .col-lg-12
+                                                            button.btn.btn-pill.btn-primary(type="submit")
+                                                                if sshPublicKey
+                                                                    i.pe-7s-refresh
+                                                                    | &nbsp;&nbsp; Update key
+                                                                else
+                                                                    i.pe-7s-upload
+                                                                    | &nbsp;&nbsp; Upload key
                                 else 
                                     .card-header.card-body
                                         div.alert.alert-danger
@@ -137,6 +212,7 @@ html(lang='en')
                                     return;
                                 }
                             });
+                            console.log(response)
                             var form = $('<form action="/utils/verify-token" method="post">' +
                                           '<input type="hidden" name="loginResponse" value='+JSON.stringify(response)+'></form>');
                             $('body').append(form);

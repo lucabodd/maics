@@ -48,7 +48,7 @@ router.post('/user-add', function (req, res, next) {
         sys_username: req.body.uid,
         role: req.body.user_role,
         group: req_groups.join(" "),
-        sshPublicKey: undefined,
+        sshPublicKey: "",
         pwdChangedTime: ztime.current(),
         pwdAccountLockedTime: null,
         key_last_unlock: "19700101000010Z",

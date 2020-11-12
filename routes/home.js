@@ -66,6 +66,10 @@ router.get('/keys', function (req, res, next) {
                                     groups: value.group,
                                     sshPublicKey: value.sshPublicKey,
                                     sign_challenge: JSON.stringify(req.session.u2f),
+                                    otp_verified: req.session.otp_verified,
+                                    otp_enabled: value.otp_enabled,
+                                    token_verified: req.session.token_verified,
+                                    token_enabled: value.token_enabled,
                                     key_lock: req.session.key_lock,
                                     url: config.maics.url,
                                     code: req.query.code,
@@ -88,7 +92,7 @@ router.get('/2fa', function(req, res, next) {
         mdb.connect(mongo_instance)
         .then(
             function() {
-                mdb.findDocument("users", {email: req.session.email}, {otp_secret: 1, token_publicKey:1})
+                mdb.findDocument("users", {email: req.session.email})
                 .then(
                     function(value){
                         var secret = speakeasy.generateSecret({length: 32});
@@ -104,11 +108,14 @@ router.get('/2fa', function(req, res, next) {
                                 challenge = "true";
 
                             res.render('2fa', {
+                                sys_username: value.sys_username,
                                 username: req.session.email,
                                 role: req.session.role,
                                 otp_secret: otp_secret,
                                 otp_qr: image_data,
                                 token_challenge: challenge,
+                                token_enabled: value.token_enabled,
+                                otp_enabled: value.otp_enabled,
                                 url: config.maics.url,
                                 error: req.query.error
                             });

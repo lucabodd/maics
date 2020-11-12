@@ -74,7 +74,7 @@ router.get('/verify-otp', function (req, res, next) {
                                     data = hash.update(plain_otp_secret+req.session.master_key, 'utf-8');
                                     gen_hash= data.digest('hex');
                                     console.log(gen_hash)
-                                    req.session.master_key = data;
+                                    req.session.otp_secret_hash = data;
                                 }
                                 res.redirect("/home/keys?error=false");
                             }
@@ -104,12 +104,14 @@ router.post('/verify-token', function (req, res, next) {
                 function(user){
                     success = u2f.checkSignature(req.session.u2f, JSON.parse(req.body.loginResponse), user.token_publicKey);
                     if(success.successful){
-                        req.session.otp_verified = true;
-                        var hash = crypto.createHash('sha512');
-                        data = hash.update(user.token_publicKey+req.session.master_key, 'utf-8');
-                        gen_hash= data.digest('hex');
-                        console.log(gen_hash)
-                        req.session.master_key = data;
+                        if(!req.session.token_verified){
+                            req.session.token_verified = true;
+                            var hash = crypto.createHash('sha512');
+                            data = hash.update(user.token_publicKey+req.session.master_key, 'utf-8');
+                            gen_hash= data.digest('hex');
+                            console.log(gen_hash)
+                            req.session.token_secret_hash = data;
+                        }
                         res.redirect("/home/keys?error=false");
                     }
                     else{
@@ -129,60 +131,112 @@ router.post('/verify-token', function (req, res, next) {
     );
 });
 
+
+router.post('/key-unlock', function (req, res, next) {
+    //test
+    var hash = crypto.createHash('sha512');
+    data = hash.update(req.session.otp_secret_hash+req.session.token_secret_hash, 'utf-8');
+    gen_hash= data.digest('hex');
+    console.log("OTP hash:"+req.session.otp_secret_hash)
+    console.log("TKN hash:"+req.session.token_secret_hash)
+    console.log("HASHSUM: "+gen_hash)
+
+    mdb.connect(mongo_instance)
+    .then(
+        function(){
+            mdb.findDocument("users", {email: req.session.email})
+            .then(
+                function(user){
+                    if(user.otp_enabled==req.session.otp_verified && user.token_enabled==req.session.token_verified){
+                        req.session.key_lock=false;
+                        mdb.updDocument("users", {email: req.session.email}, {$set: { key_last_unlock: ztime.current() }})
+                            .then(
+                                function(){
+                                    diffHours = ztime.hoursDiff(user.key_last_unlock); //user from first find
+                                    if(diffHours<9)
+                                    {
+                                        log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
+                                        log("[+] User "+req.session.email+" successfully unlocked his SSH key. request occurred from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                                        res.redirect("/home/keys?error=false");
+                                    }
+                                    else{
+                                        log("[+] MAICS is decripting "+req.session.email+" key", app_log);
+                                        //user first unlock
+                                        if(user.sshPublicKey == "")
+                                        {
+                                            log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
+                                            res.redirect("/home/keys?error=false");
+                                        }
+                                        else if(user.sshPublicKey.indexOf("ssh-rsa") == -1)
+                                        {
+                                            var hash = crypto.createHash('sha512');
+                                            data = hash.update(req.session.otp_secret_hash+req.session.token_secret_hash, 'utf-8');
+                                            gen_hash= data.digest('hex');
+                                            console.log("OTP hash:"+req.session.otp_secret_hash)
+                                            console.log("TKN hash:"+req.session.token_secret_hash)
+                                            console.log("HASHSUM: "+gen_hash)
+
+                                            const decKey = aes_256_cfb.AESdecrypt(gen_hash, user.sshPublicKey);
+                                            mdb.updDocument("users", {sys_username: user.sys_username}, { $set: { sshPublicKey: decKey }})
+                                                .then(
+                                                        function(){
+                                                            ldap.modKey(user.sys_username, decKey)
+                                                                .then(
+                                                                    function(succ){
+                                                                        log("[+] SKDC successfully decrypted "+req.session.email+" key", app_log);
+                                                                        log("[+] User "+user.email+" public key unlocked in specified timestamp by OTP authentication", journal_log);
+                                                                        res.redirect("/home/keys?error=false");
+                                                                    },
+                                                                    function(err){
+                                                                        log('[-] Connection to LDAP has been established, but no query can be performed, reason: '+err.message, app_log);
+                                                                        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                                                                    }
+                                                                )
+                                                        },
+                                                        function(err){
+                                                            log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                                                            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                                                        }
+                                                );
+                                        }
+                                        else{
+                                            log("[+] MAICS key of "+req.session.email+" already decrypted, last unlock time: "+user.key_last_unlock+" no decryption needed.", app_log);
+                                            res.redirect("/home/keys?error=false");
+                                        }
+                                    }
+                                },
+                                function(err){
+                                    log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                                }
+                            );
+                    }
+                    else{
+                        res.redirect("/home/keys?error=true&code=\'SK010\'");
+                    }
+                },
+                function(err){
+                    log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                }
+            );
+        },
+        function(err){
+            log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+        }
+    );
+});
                                 /*
-                                mdb.updDocument("users", {email: req.session.email}, {$set: { key_last_unlock: ztime.current() }})
-                                    .then(
-                                        function(){
-                                            //at first unlock key_last_unlock attribute is undefined
-                                            if (user.key_last_unlock == undefined)
-                                                user.key_last_unlock = ztime.current()
-                                            diffHours = ztime.hoursDiff(user.key_last_unlock);
+
+
+
 
                                             //if less than 9 means 1 decryption has already been performed, no decryption needed
-                                            if(diffHours<9)
-                                            {
-                                                log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
-                                                log("[+] User "+req.session.email+" successfully unlocked his SSH key. request occurred from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                                res.redirect("/home/keys?error=false");
-                                            }
+
                                             else{
-                                                log("[+] SKDC is decripting "+req.session.email+" key", app_log);
-                                                //user first unlock
-                                                if(user.sshPublicKey == undefined)
-                                                {
-                                                    log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
-                                                    res.redirect("/home/keys?error=false");
-                                                }
-                                                else if(user.sshPublicKey.indexOf("ssh-rsa") == -1)
-                                                {
-                                                    var key = Buffer.from(base32Decode(user.otp_secret, 'RFC4648'), 'HEX').toString();
-                                                    const decKey = aes_256_cfb.AESdecrypt(key, user.sshPublicKey);
-                                                    mdb.updDocument("users", {sys_username: user.sys_username}, { $set: { sshPublicKey: decKey }})
-                                                        .then(
-                                                                function(){
-                                                                    ldap.modKey(user.sys_username, decKey)
-                                                                        .then(
-                                                                            function(succ){
-                                                                                log("[+] SKDC successfully decrypted "+req.session.email+" key", app_log);
-                                                                                log("[+] User "+user.email+" public key unlocked in specified timestamp by OTP authentication", journal_log);
-                                                                                res.redirect("/home/keys?error=false");
-                                                                            },
-                                                                            function(err){
-                                                                                log('[-] Connection to LDAP has been established, but no query can be performed, reason: '+err.message, app_log);
-                                                                                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                                                                            }
-                                                                        )
-                                                                },
-                                                                function(err){
-                                                                    log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                                                                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                                                                }
-                                                        );
-                                                }
-                                                else{
-                                                    log("[+] SKDC key of "+req.session.email+" already decrypted, last unlock time: "+user.key_last_unlock+" no decryption needed.", app_log);
-                                                    res.redirect("/home/keys?error=false");
-                                                }
+
+
                                             }
                                         },
                                         function(err){

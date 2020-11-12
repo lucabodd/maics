@@ -53,69 +53,102 @@ html(lang='en')
                                 .row 
                                     .col-sm-6
                                         .card
-                                            if otp_secret != "true"
-                                                .card-header
-                                                    h5 Setup Google Authenticator
-                                                    span Download Google Authenticator on your Android/iOS device, scan this QRcode, and once you are done click on save button below. Scanning this QR will meke you able to generate an authentication OTPs
-                                                    a(href='/home/keys') manage SSH Key page
-                                                .card-body
-                                                    .row.justify-content-center
-                                                        img(src=otp_qr)
-                                                    .row.justify-content-center
-                                                        .p-10
-                                                            button.btn.btn-pill.btn-primary(onclick="confirm('"+otp_secret+"');")
-                                                                i.pe-7s-diskette
-                                                                | &nbsp;&nbsp;Enroll OTP Key
-                                                        .p-10
-                                                            button.btn.btn-pill.btn-primary(onclick="window.location.reload();")
-                                                                i.pe-7s-refresh
-                                                                | &nbsp;&nbsp;Re-gen
+                                            //otp verification parse
+                                            if otp_enabled
+                                                if otp_secret != "true"
+                                                    .card-header
+                                                        h5 Setup Google Authenticator
+                                                        span Download Google Authenticator on your Android/iOS device, scan this QRcode, and once you are done click on save button below. Scanning this QR will meke you able to generate an authentication OTPs
+                                                        a(href='/home/keys') manage SSH Key page
+                                                    .card-body
+                                                        .row.justify-content-center
+                                                            img(src=otp_qr)
+                                                        .row.justify-content-center
+                                                            .p-10
+                                                                button.btn.btn-pill.btn-primary(onclick="confirm('"+otp_secret+"');")
+                                                                    i.pe-7s-diskette
+                                                                    | &nbsp;&nbsp;Enroll OTP Key
+                                                            .p-10
+                                                                button.btn.btn-pill.btn-primary(onclick="window.location.reload();")
+                                                                    i.pe-7s-refresh
+                                                                    | &nbsp;&nbsp;Re-gen
+                                                else
+                                                    .card-header
+                                                        h5 Google Authenticator Enrolled
+                                                        span You already registered the secret.
+                                                        a(href='/home/keys') manage SSH Key page
+                                                    .card-body
+                                                        .row.justify-content-center
+                                                            .p-10 
+                                                                    img(src="../../assets/images/gotp-enrolled.png")
+                                                        .row.justify-content-center
+                                                            .p-10
+                                                                    button.btn.btn-pill.btn-info(disabled)
+                                                                        i.pe-7s-like2
+                                                                        | &nbsp;&nbsp;OTP Enrolled
                                             else
-                                                .card-header
-                                                    h5 Google Authenticator Enrolled
-                                                    span You already registered the secret.
-                                                    a(href='/home/keys') manage SSH Key page
-                                                .card-body
-                                                    .row.justify-content-center
-                                                        .p-10 
-                                                                img(src="../../assets/images/gotp-enrolled.png")
-                                                    .row.justify-content-center
-                                                        .p-10
-                                                                button.btn.btn-pill.btn-info(disabled)
-                                                                    i.pe-7s-like2
-                                                                    | &nbsp;&nbsp;OTP Enrolled
+                                                    //otp disabled by admin
+                                                    .card-header
+                                                        h5 Google Authenticator
+                                                        span Administrator disabled google authenticator for #{sys_username}
+                                                        a(href='/home/keys') manage SSH Key page
+                                                    .card-body
+                                                        .row.justify-content-center
+                                                            .p-10 
+                                                                    img(src="../../assets/images/gotp-disabled.png")
+                                                        .row.justify-content-center
+                                                            .p-10
+                                                                    button.btn.btn-pill.btn-danger(disabled)
+                                                                        i.pe-7s-like2
+                                                                        | &nbsp;&nbsp;OTP Disabled
                                                             
                                     .col-sm-6
                                         .card
-                                            if token_challenge != "true"
-                                                .card-header
-                                                    h5 Setup hardware token
-                                                    span Please insert the company providen security hardware key, click 'Enroll Token' and press the key's button when it blinks, then wait till your security token is registered in MAICS system.
-                                                    a(href='/home/keys') manage SSH Key page
-                                                .card-body    
-                                                    .row.justify-content-center
-                                                        .p-10 
-                                                                img(src="../../assets/images/yubikey.png")
-                                                    .row.justify-content-center
-                                                        .p-10
-                                                                button.btn.btn-pill.btn-primary(id="enroll-button")
-                                                                    i.pe-7s-diskette
-                                                                    | &nbsp;&nbsp;Enroll Token
+                                            //token verification parse
+                                            if token_enabled
+                                              if token_challenge != "true"
+                                                  .card-header
+                                                      h5 Setup hardware token
+                                                      span Please insert the company providen security hardware key, click 'Enroll Token' and press the key's button when it blinks, then wait till your security token is registered in MAICS system.
+                                                      a(href='/home/keys') manage SSH Key page
+                                                  .card-body    
+                                                      .row.justify-content-center
+                                                          .p-10 
+                                                                  img(src="../../assets/images/yubikey.png")
+                                                      .row.justify-content-center
+                                                          .p-10
+                                                                  button.btn.btn-pill.btn-primary(id="enroll-button")
+                                                                      i.pe-7s-diskette
+                                                                      | &nbsp;&nbsp;Enroll Token
+                                              else
+                                                  .card-header
+                                                      h5 Hardware Token Enrolled
+                                                      span You already registered the token.
+                                                      a(href='/home/keys') manage SSH Key page
+                                                  .card-body    
+                                                      .row.justify-content-center
+                                                          .p-10 
+                                                                  img(src="../../assets/images/yubikey-enrolled.png")
+                                                      .row.justify-content-center
+                                                          .p-10
+                                                                  button.btn.btn-pill.btn-info(disabled)
+                                                                      i.pe-7s-like2
+                                                                      | &nbsp;&nbsp;Token Enrolled
                                             else
-                                                .card-header
-                                                    h5 Hardware Token Enrolled
-                                                    span You already registered the token.
-                                                    a(href='/home/keys') manage SSH Key page
-                                                .card-body    
-                                                    .row.justify-content-center
-                                                        .p-10 
-                                                                img(src="../../assets/images/yubikey-enrolled.png")
-                                                    .row.justify-content-center
-                                                        .p-10
-                                                                button.btn.btn-pill.btn-info(disabled)
-                                                                    i.pe-7s-like2
-                                                                    | &nbsp;&nbsp;Token Enrolled
-                                                                    
+                                                      //otp disabled by admin
+                                                      .card-header
+                                                          h5 Hardware token
+                                                          span Administrator disabled token authentication for #{sys_username}
+                                                          a(href='/home/keys') manage SSH Key page
+                                                      .card-body
+                                                          .row.justify-content-center
+                                                              .p-10 
+                                                                      img(src="../../assets/images/yubikey-disabled.png")
+                                                          .row.justify-content-center
+                                                              .p-10
+                                                                      button.btn.btn-pill.btn-danger(disabled)
+                                                                          i.pe-7s-like2
+                                                                          | &nbsp;&nbsp;Token Disabled                        
                                     
                             
                     // Container-fluid Ends
