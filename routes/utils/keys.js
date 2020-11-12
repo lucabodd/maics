@@ -73,8 +73,7 @@ router.get('/verify-otp', function (req, res, next) {
                                     var plain_otp_secret = Buffer.from(base32Decode(user.otp_secret, 'RFC4648'), 'HEX').toString();
                                     data = hash.update(plain_otp_secret+req.session.master_key, 'utf-8');
                                     gen_hash= data.digest('hex');
-                                    console.log(gen_hash)
-                                    req.session.otp_secret_hash = data;
+                                    req.session.otp_secret_hash = gen_hash;
                                 }
                                 res.redirect("/home/keys?error=false");
                             }
@@ -109,8 +108,7 @@ router.post('/verify-token', function (req, res, next) {
                             var hash = crypto.createHash('sha512');
                             data = hash.update(user.token_publicKey+req.session.master_key, 'utf-8');
                             gen_hash= data.digest('hex');
-                            console.log(gen_hash)
-                            req.session.token_secret_hash = data;
+                            req.session.token_secret_hash = gen_hash;
                         }
                         res.redirect("/home/keys?error=false");
                     }
@@ -137,8 +135,8 @@ router.post('/key-unlock', function (req, res, next) {
     var hash = crypto.createHash('sha512');
     data = hash.update(req.session.otp_secret_hash+req.session.token_secret_hash, 'utf-8');
     gen_hash= data.digest('hex');
-    console.log("OTP hash:"+req.session.otp_secret_hash)
-    console.log("TKN hash:"+req.session.token_secret_hash)
+    console.log("OTP hash: "+req.session.otp_secret_hash)
+    console.log("TKN hash: "+req.session.token_secret_hash)
     console.log("HASHSUM: "+gen_hash)
 
     mdb.connect(mongo_instance)

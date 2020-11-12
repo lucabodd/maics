@@ -54,7 +54,9 @@ router.post('/user-add', function (req, res, next) {
         key_last_unlock: "19700101000010Z",
         otp_secret: "",
         token_publicKey: "",
-        token_keyHandle: ""
+        token_keyHandle: "",
+        otp_enabled: true,
+        token_enabled: false
     };
 
     mdb.connect(mongo_instance)
