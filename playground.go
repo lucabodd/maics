@@ -8,126 +8,75 @@ import (
     "crypto/aes"
     "crypto/cipher"
     "crypto/rand"
+	"crypto/sha256"
     "errors"
     "strings"
-	"flag"
-	"os"
-	"encoding/json"
 	"log"
-	ldap_client "github.com/lucabodd/go-ldap-client"
 )
-type Configuration struct {
-	Skdc struct {
-		Dir     string
-		Log_dir string
-		Run_dir string
-		User	string
-		Admin_mail string
-	}
-	Mongo struct {
-		Url 	string
-		Instance string
-	}
-	Ldap struct {
-		Uri 	string
-		Base_dn string
-		Bind_dn string
-		Bind_password string
-		Read_only_dn string
-		Read_only_password string
-	}
-}
 func main() {
+	ecn := AESencrypt("55f348eee2396169adc70659b73b8c7ad3543ba45ca3969f06ad3550ec7c17a394f94e00af9f38d1df589777581ac096eb5343f1d4c3ec786ea17fce95385e39",
+					  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnA/FrULTEx8d73BV3yLVbpGDDIQDukwpz/Mo3wbOvTqGuX0miOhCpS25LGfuyUriURUQfLJmbEbSxbD3Nic5AifglzF2ZJuLCKGh3wmQtm4hAOC4xrjVuAd2YFsSCTk5uc6QHRw4LPILZ2r6EDFVCunWCfaSpKmJuIbdlQ19xHtjX+iOGmHweodvtQhipRs6Ls4J0JcxriYsEcsB67M2kSd3DUlU5mAw9clAG/Uye6ASYCAfhHuj4GdyVvYV/U7u/v18MTgNP06zV/M9knGWHKlrBOGqusQjrdyQZSAico1QbL0MGQyNY7H48joz/M16lkAlDAsbpEMLV2/zbfU77 luca.bodini")
 
-	c := flag.String("c", "","Specify the configuration file.")
-    flag.Parse()
+	fmt.Println(ecn)
 
-	file, err := os.Open(*c)
-	if err != nil {
-		log.Fatal("[-] Can't open config file: ", err)
-	}
-	defer file.Close()
-	decoder := json.NewDecoder(file)
-	Config := Configuration{}
-	err = decoder.Decode(&Config)
-
-	host := strings.Split(Config.Ldap.Uri, "//")[1]
-	ldap := &ldap_client.LDAPClient{
-		Base:         Config.Ldap.Base_dn,
-		Host:         host,
-		Port:         636,
-		UseSSL:       true,
-		InsecureSkipVerify: true,
-		BindDN:       Config.Ldap.Bind_dn,
-		BindPassword: Config.Ldap.Bind_password,
-		UserFilter:   "(uid=%s)",
-		GroupFilter: "(memberUid=%s)",
-		Attributes:   []string{},
-	}
-
-	groups, err := ldap.GetUserGroups("luca.bodini")
-	fmt.Println(groups)
-/*
-	encKey, err := AESencrypt([]byte("key0123456789asd"), "asd")
-	fmt.Println(encKey)
-	check(err)
-	encKey, err = AESdecrypt([]byte("key0123456789asd"), encKey)
-	check(err)
-	fmt.Println(encKey)
-	*/
+	dec := AESdecrypt("55f348eee2396169adc70659b73b8c7ad3543ba45ca3969f06ad3550ec7c17a394f94e00af9f38d1df589777581ac096eb5343f1d4c3ec786ea17fce95385e39",
+				ecn)
+	fmt.Println(dec)
+}
+//utilityes
+/***************************************
+	AES encryption
+****************************************/
+func AESencrypt(keyStr string, cryptoText string) string {
+	keyBytes := sha256.Sum256([]byte(keyStr))
+	return encrypt(keyBytes[:], cryptoText)
 }
 
-func AESencrypt(key []byte, message string) (encmess string, err error) {
-	plainText := []byte(message)
+// encrypt string to base64 crypto using AES
+func encrypt(key []byte, text string) string {
+	plaintext := []byte(text)
 
 	block, err := aes.NewCipher(key)
-	if err != nil {
-		return
-	}
+	Check(err)
 
-	//IV needs to be unique, but doesn't have to be secure.
-	//It's common to put it at the beginning of the ciphertext.
-	cipherText := make([]byte, aes.BlockSize+len(plainText))
-	iv := cipherText[:aes.BlockSize]
-	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
-		return
-	}
+	// The IV needs to be unique, but not secure. Therefore it's common to
+	// include it at the beginning of the ciphertext.
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	_, err = io.ReadFull(rand.Reader, iv)
+	Check(err)
 
 	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
 
-	//returns to base64 encoded string
-	encmess = base64.URLEncoding.EncodeToString(cipherText)
-	return
+	return base64.StdEncoding.EncodeToString(ciphertext)
 }
 
-func AESdecrypt(key []byte, text string) (string, error) {
-    block, err := aes.NewCipher(key)
-    if err != nil {
-        return "", err
-    }
+func AESdecrypt(keyStr string, cryptoText string) string {
+	keyBytes := sha256.Sum256([]byte(keyStr))
+	return decrypt(keyBytes[:], cryptoText)
+}
 
-    decodedMsg, err := base64.URLEncoding.DecodeString(addBase64Padding(text))
-    if err != nil {
-        return "", err
-    }
+// decrypt from base64 to decrypted string
+func decrypt(key []byte, cryptoText string) string {
+	ciphertext, err := base64.StdEncoding.DecodeString(cryptoText)
+	Check(err)
 
-    if (len(decodedMsg) % aes.BlockSize) != 0 {
-        return "", errors.New("blocksize must be multipe of decoded message length")
-    }
+	block, err := aes.NewCipher(key)
+	Check(err)
 
-    iv := decodedMsg[:aes.BlockSize]
-    msg := decodedMsg[aes.BlockSize:]
+	// The IV needs to be unique, but not secure. Therefore it's common to
+	// include it at the beginning of the ciphertext.
+	if len(ciphertext) < aes.BlockSize {
+		panic("ciphertext too short")
+	}
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+	stream := cipher.NewCFBDecrypter(block, iv)
 
-    cfb := cipher.NewCFBDecrypter(block, iv)
-    cfb.XORKeyStream(msg, msg)
-
-    unpadMsg, err := Unpad(msg)
-    if err != nil {
-        return "", err
-    }
-
-    return string(unpadMsg), nil
+	// XORKeyStream can work in-place if the two arguments are the same.
+	stream.XORKeyStream(ciphertext, ciphertext)
+	return fmt.Sprintf("%s", ciphertext)
 }
 
 func Pad(src []byte) []byte {
@@ -157,7 +106,7 @@ func addBase64Padding(value string) string {
 
     return value
 }
-func check(e error) {
+func Check(e error) {
 	if e != nil {
 		log.Fatal(e)
 		panic(e)

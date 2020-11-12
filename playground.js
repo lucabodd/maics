@@ -1,54 +1,6 @@
-const U2F = require("u2f");
-const Express = require("express");
-const BodyParser = require("body-parser");
-const Cors = require("cors");
-const HTTPS = require("https");
-const FS = require("fs");
-const session = require("express-session");
-
-const APP_ID = "https://appliance.maics.com";
-
-var app = Express();
-
-app.use(session({ secret: "thepolyglotdeveloper", cookie: { secure: true, maxAge: 60000 }, saveUninitialized: true, resave: true }));
-app.use(BodyParser.json());
-app.use(BodyParser.urlencoded({ extended: true }));
-app.use(Cors({ origin: [APP_ID], credentials: true }));
-
-var user;
-
-app.get("/register", (request, response, next) => {
-    request.session.u2f = U2F.request(APP_ID);
-    response.send(request.session.u2f);
-});
-
-app.post("/register", (request, response, next) => {
-    var registration = U2F.checkRegistration(request.session.u2f, request.body.registerResponse);
-    if(!registration.successful) {
-        return response.status(500).send({ message: "error" });
-    }
-    user = registration;
-    response.send({ message: "The hardware key has been registered" });
-});
-
-app.get("/login", (request, response, next) => {
-    request.session.u2f = U2F.request(APP_ID, user.keyHandle);
-    response.send(request.session.u2f);
-});
-
-app.get("/", (request, response, next) => {
-    response.sendFile("index.html", {root: __dirname });
-});
+var AES_256_CFB = require("./modules/aes-256-cfb");
+var aes_256_cfb = new AES_256_CFB();
 
 
-app.post("/login", (request, response, next) => {
-    var success = U2F.checkSignature(request.session.u2f, request.body.loginResponse, user.publicKey);
-    response.send(success);
-});
-
-HTTPS.createServer({
-    key: FS.readFileSync("ssl/https/key.pem"),
-    cert: FS.readFileSync("ssl/https/certificate.pem")
-}, app).listen(443, () => {
-    console.log("Listening at :443...");
-});
+res = aes_256_cfb.AESdecrypt("55f348eee2396169adc70659b73b8c7ad3543ba45ca3969f06ad3550ec7c17a394f94e00af9f38d1df589777581ac096eb5343f1d4c3ec786ea17fce95385e39", "NjL6u/B6TUIqe47CcZ1ZesWpDsKPzT/dcmwIhNirnQeTQEEeCpUTML/xSbgktt1RXUG4d7dpSRbQCrwOq+QIPM3om7Cpx+zar2MPIE/ED2HY7eGRNpqhSAZKHF5x8/SF1pwMA+IN63HGSfnMi9hf9se5re8Nx+ryHhouLxYqvKCWKJ+Wr3Kpzc084jmC7AH8eCbZDEnmKqQSMZJRUnuYFOtGGYG6uDvZbaj9MG6ZtQ2+kLOaoiQUrSyW7V0RnjVDYqU3BVXmENtKdHnzaBQfgsx5vjAnt7PdJe9SkVFEydm6twL4pgBRXJPTPcUuyq9KSKD1rD9GnxXTBkWrfWYn86+hU7qLZFfvgG7Sb24U7+0qfD+2hlFR3WDptnL4mvL8C5OqnZuMhfUf6iUuKsS5p4Gg5mWKSnyfer+zVm3wjRis3RzJUq95pgrH21bLBE3Gkuvuq+1cLB7wWfUYzrSkiEFLkkVK1baZkQvDInESmhJWInieAmc6+vTT5Atf5n81lWTnQ54G+CY+Kp+EsoYqjeY+54nn8SYF")
+console.log(res);

@@ -71,7 +71,7 @@ router.get('/verify-otp', function (req, res, next) {
                                     req.session.otp_verified = true;
                                     var hash = crypto.createHash('sha512');
                                     var plain_otp_secret = Buffer.from(base32Decode(user.otp_secret, 'RFC4648'), 'HEX').toString();
-                                    data = hash.update(plain_otp_secret+req.session.master_key, 'utf-8');
+                                    data = hash.update(plain_otp_secret, 'utf-8');
                                     gen_hash= data.digest('hex');
                                     req.session.otp_secret_hash = gen_hash;
                                 }
@@ -106,7 +106,7 @@ router.post('/verify-token', function (req, res, next) {
                         if(!req.session.token_verified){
                             req.session.token_verified = true;
                             var hash = crypto.createHash('sha512');
-                            data = hash.update(user.token_publicKey+req.session.master_key, 'utf-8');
+                            data = hash.update(user.token_publicKey, 'utf-8');
                             gen_hash= data.digest('hex');
                             req.session.token_secret_hash = gen_hash;
                         }
@@ -225,40 +225,7 @@ router.post('/key-unlock', function (req, res, next) {
         }
     );
 });
-                                /*
 
-
-
-
-                                            //if less than 9 means 1 decryption has already been performed, no decryption needed
-
-                                            else{
-
-
-                                            }
-                                        },
-                                        function(err){
-                                            log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                                            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                                        }
-                                    );
-                            }
-                            else{
-                                log("[*] User "+user.sys_username+" failed to unlock ssh public ket, reason: wrong OTP key",app_log);
-                                res.redirect("/home/keys?error=true&code=\'SK010\'");
-                            }
-                        },
-                        function(err){
-                            log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                        }
-                    );
-            }, function(err){
-                log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-            }
-        );
-});*/
 
 router.get('/key-enroll-otp-secret', function (req, res, next) {
         var secret = req.query.otp_secret;
