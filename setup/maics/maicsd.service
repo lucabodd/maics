@@ -1,0 +1,16 @@
+[Unit]
+Description=MAICS daemon service
+
+[Service]
+Type=forking
+RuntimeDirectory=maics/
+User=1001
+Group=1001
+PIDFile=/var/run/maics/maics.pid
+ExecStart=maicsd -c /var/www/maics/etc/config.json
+ExecStop=maicsd -c /var/www/maics/etc/config.json -s quit
+ExecReload=maicsd -c /var/www/maics/etc/config.json -s reload
+SendSIGHUP=yes
+
+[Install]
+WantedBy=multi-user.target

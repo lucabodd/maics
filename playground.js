@@ -1,6 +1,4 @@
-var AES_256_CFB = require("./modules/aes-256-cfb");
-var aes_256_cfb = new AES_256_CFB();
+var ZT = require("./modules/ztime");
+var ztime = new ZT();
 
-
-res = aes_256_cfb.AESdecrypt("55f348eee2396169adc70659b73b8c7ad3543ba45ca3969f06ad3550ec7c17a394f94e00af9f38d1df589777581ac096eb5343f1d4c3ec786ea17fce95385e39", "NjL6u/B6TUIqe47CcZ1ZesWpDsKPzT/dcmwIhNirnQeTQEEeCpUTML/xSbgktt1RXUG4d7dpSRbQCrwOq+QIPM3om7Cpx+zar2MPIE/ED2HY7eGRNpqhSAZKHF5x8/SF1pwMA+IN63HGSfnMi9hf9se5re8Nx+ryHhouLxYqvKCWKJ+Wr3Kpzc084jmC7AH8eCbZDEnmKqQSMZJRUnuYFOtGGYG6uDvZbaj9MG6ZtQ2+kLOaoiQUrSyW7V0RnjVDYqU3BVXmENtKdHnzaBQfgsx5vjAnt7PdJe9SkVFEydm6twL4pgBRXJPTPcUuyq9KSKD1rD9GnxXTBkWrfWYn86+hU7qLZFfvgG7Sb24U7+0qfD+2hlFR3WDptnL4mvL8C5OqnZuMhfUf6iUuKsS5p4Gg5mWKSnyfer+zVm3wjRis3RzJUq95pgrH21bLBE3Gkuvuq+1cLB7wWfUYzrSkiEFLkkVK1baZkQvDInESmhJWInieAmc6+vTT5Atf5n81lWTnQ54G+CY+Kp+EsoYqjeY+54nn8SYF")
-console.log(res);
+console.log(ztime.hoursDiff("20201112221416Z"))

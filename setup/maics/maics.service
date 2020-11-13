@@ -1,0 +1,15 @@
+[Unit]
+Description=MAICS appliance service
+After=network.target
+
+[Service]
+Type=simple
+User=1001
+Group=1001
+Restart=always
+RestartSec=1
+ExecStart=/usr/bin/node /var/www/maics/app.js
+StandardOutput=file:/var/log/maics/server.log
+
+[Install]
+WantedBy=multi-user.target
