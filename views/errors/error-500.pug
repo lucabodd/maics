@@ -16,6 +16,8 @@ html(lang='en')
                 p.sub-content
                   | Error #{message}: #{error.status}
                 p.sub-content
+                  | #{detail}
+                p.sub-content
                   | #{error.detail}
               div
                 a.btn.btn-primary.btn-lg(href="javascript:window.history.back();") GO BACK
