@@ -17,6 +17,7 @@ const log = require('log-to-file');
 const app_log = config.maics.log_dir+"app.log"
 
 var homeRouter = require('./routes/home');
+var keysRouter = require('./routes/keys');
 var authRouter = require('./routes/login');
 var usersRouter = require('./routes/users');
 var hostRouter = require('./routes/hosts');
@@ -76,6 +77,7 @@ app.get('/home/tech/*', function(req,res,next){
 });
 
 app.use('/home/', homeRouter);
+app.use('/keys/', keysRouter);
 app.use('/users/', usersRouter);
 app.use('/hosts/', hostRouter);
 app.use('/', authRouter);
