@@ -215,16 +215,10 @@ router.post("/password-reset", function (req,res,next) {
                         res.redirect("/login");
                     }
                 },
-                function(err){
-                    log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                    res.render('error-500',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                }
+                function(err){ errors.mdb_query_error(res, err); }
             );
         },
-        function(err){
-            log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-        }
+        function (err) { errors.mdb_connection_refused(res, err); }
     );
 });
 module.exports = router;

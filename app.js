@@ -23,6 +23,7 @@ var usersRouter = require('./routes/users');
 var hostRouter = require('./routes/hosts');
 var accessRouter = require('./routes/access');
 var apiRouter = require('./routes/api');
+var confinementRouter = require('./routes/confinement');
 //Utility routes
 var utilsIdentityRouter = require('./routes/utils/authentication');
 var utilsKeysRouter = require('./routes/utils/keys');
@@ -43,7 +44,9 @@ app.set('views', [path.join(__dirname, 'views'),
                   path.join(__dirname, 'views/users/'),
                   path.join(__dirname, 'views/hosts/'),
                   path.join(__dirname, 'views/errors/'),
-                  path.join(__dirname, 'views/access/')]);
+                  path.join(__dirname, 'views/access/'),
+                  path.join(__dirname, 'views/confinement/'),
+                  path.join(__dirname, 'views/keys/')]);
 app.set('view engine', 'pug');
 
 //app.use(logger(':date - :method   :url :response-time :user-agent'));
@@ -57,7 +60,7 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: '21600'}));
 //middleware authorization for routes
 //require authentication for all except /api/
 app.get(/^\/(?!api).*/, function(req,res,next){
-        if (req.session.email == undefined)
+        if (!req.session.email)
             res.render('login');
         else
             next();
@@ -84,6 +87,7 @@ app.use('/', authRouter);
 app.use('/', hostRouter);
 app.use('/access/', accessRouter);
 app.use('/api/', apiRouter);
+app.use('/confinement/', confinementRouter);
 //utility routes
 app.use('/utils/', utilsUsersRouter);
 app.use('/utils/', utilsIdentityRouter);

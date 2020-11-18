@@ -1,6 +1,11 @@
 //Configurations
 const config = require('../etc/config.json');
 
+//Errors handling
+var Errors = require("../modules/errors-handling");
+var errors = new Errors();
+
+
 //Web server
 var express = require('express');
 var app = express();
@@ -41,7 +46,7 @@ router.get('/management', function (req, res, next) {
                                 if (value.token_keyHandle)
                                     req.session.u2f = u2f.request(APP_ID, value.token_keyHandle);
 
-                                res.render('keys', {
+                                res.render('keys-management', {
                                     name: value.name,
                                     surname: value.surname,
                                     username: req.session.email,
@@ -60,16 +65,11 @@ router.get('/management', function (req, res, next) {
                                     error: err
                                 });
                             },
-                            function (err) {
-                                log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                            }
+                            function(err){ errors.mdb_query_error(res,err); }
                         );
                 },
-                function(err){
-                    log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                });
+                function (err) { errors.mdb_connection_refused(res, err)}
+            );
 });
 
 router.get('/2fa', function(req, res, next) {
@@ -91,7 +91,7 @@ router.get('/2fa', function(req, res, next) {
                             else
                                 challenge = "true";
 
-                            res.render('2fa', {
+                            res.render('keys-2fa', {
                                 sys_username: value.sys_username,
                                 username: req.session.email,
                                 role: req.session.role,
@@ -104,16 +104,11 @@ router.get('/2fa', function(req, res, next) {
                                 error: req.query.error
                             });
                         });
-                    }, function(err){
-                        log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
-                        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-                    }
+                    },
+                    function(err){ errors.mdb_query_error(res,err); }
                 );
             },
-            function (err) {
-                log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-            }
+            function (err) { errors.mdb_connection_refused(res, err)}
         )
 });
 

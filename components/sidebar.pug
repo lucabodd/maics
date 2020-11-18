@@ -82,28 +82,32 @@
                                     li
                                         a(href='/access/groups')
                                             | Grant Groups
+                                    li.iconbar-header.sub-header Reports
                                     li
                                         a(href='/access/compliance')
-                                            | Compliance
+                                            | Access Compliance
                                    
                             li
                                 a.bar-icons(href='javascript:void(0)')
                                     i.icofont.icofont-jail
                                     span Confine
                                 ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Manage Shells
+                                    li.iconbar-header Restricted Shells
                                     li
-                                        a(href='/users/management')
+                                        a(href='/confinement/shells/management')
                                             | Manage Shells
                                     li
-                                        a(href='/users/groups')
+                                        a(href='/confinement/shells/assign')
                                             | Assign Shell
-                                    li.iconbar-header.sub-header Manage Profiles
                                     li
-                                        a(href='/users/groups')
-                                            | Create Profile
+                                        a(href='/confinement/shells/command-sets')
+                                            | Command Sets
+                                    li.iconbar-header.sub-header Security Profiles
                                     li
-                                        a(href='/users/groups')
+                                        a(href='/confinement/profiles/management')
+                                            | Manage Profiles
+                                    li
+                                        a(href='/confinement/profiles/assign')
                                             | Assign Profile
 
 // Page Sidebar Ends
