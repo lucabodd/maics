@@ -24,8 +24,8 @@ html(lang='en')
                             .row
                                 .col-lg-6.main-header
                                     h2
-                                      | Groups
-                                    h6.mb-0 Manage groups
+                                      | Command Sets
+                                    h6.mb-0 Define Allowed Command Sets
                                 .col-lg-6.breadcrumb-right      
                                     ol.breadcrumb
                                       li.breadcrumb-item
@@ -43,45 +43,68 @@ html(lang='en')
                                 ul#pills-icontab.nav.nav-pills(role='tablist')
                                   li.nav-item
                                     a#pills-add-user-to-group-tab.nav-link.active(data-toggle='pill', href='#pills-add-user-to-group', role='tab', aria-controls='pills-add-user-to-group', aria-selected='true')
-                                      i.fa.fa-user-plus
-                                      | Add User To Group
+                                      i.icofont.icofont-terminal
+                                      | Add Command to Command Set
                                   li.nav-item
                                     a#pills-add-group-tab.nav-link(data-toggle='pill', href='#pills-add-group', role='tab', aria-controls='pills-add-group', aria-selected='false')
                                       i.fa.fa-plus
-                                      | Create Group
+                                      | Create Command Set
                                   li.nav-item
                                     a#pills-delete-group-tab.nav-link(data-toggle='pill', href='#pills-delete-group', role='tab', aria-controls='pills-delete-group', aria-selected='false')
                                       i.fa.fa-trash
-                                      | Delete Group
+                                      | Delete Command Set
                                 #pills-icontabContent.tab-content
                                   #pills-add-user-to-group.tab-pane.fade.show.active(role='tabpanel', aria-labelledby='pills-add-user-to-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
-                                                form(method='POST' action='/utils/group-add-user')
+                                                form(method='POST' action='/utils/command-set-add-command')
                                                     .mb-2
-                                                        .col-form-label Select User:
+                                                        .col-form-label Select Command Set:
                                                         select.js-example-basic-multiple.col-sm-12(name='users' multiple='multiple' style="width: 100%" required)
-                                                              if users
-                                                                  each u in users
-                                                                      option(value=u)=u.name+" "+u.surname
+                                                              if command_sets
+                                                                  each c in command_sets
+                                                                      option(value=c)=c.name
                                                     .mb-2
-                                                        .col-form-label Select Group:
-                                                        select.js-example-basic-multiple.col-sm-12(name='groups' multiple='multiple' style="width: 100%" required)
-                                                          if groups
-                                                              each val in groups
-                                                                  option(value=val.name)=val.name
+                                                        .col-form-label Enter Path:
+                                                        input.form-control(type='text', placeholder='Command Path...' name='command_path' required)
+                                                    .mb-2
+                                                        .col-form-label Access Mode:
+                                                        select.js-example-basic-single.col-sm-12(name='access_mode' style="width: 100%" required)
+                                                            option(disabled selected) Select Access Mode...
+                                                            option(value="r") Read
+                                                            option(value="w") Write
+                                                            option(value="a") Append
+                                                            option(value="ux") Unconfined Execute
+                                                            option(value="Ux") Unconfined Execute - Scrub the Environment
+                                                            option(value="px") Discrete Profile Execute
+                                                            option(value="Px") Discrete Profile Execute - Scrub the Environment
+                                                            option(value="cx") Transition to Subprofile on Execute
+                                                            option(value="Cx") Transition to Subprofile on Execute - Scrub the Environment
+                                                            option(value="ix") Inherit Execute
+                                                            option(value="pix") Discrete Profile Execute with Inherit Fallback
+                                                            option(value="Pix") Discrete Profile Execute with Inherit Fallback - Scrub the Environment
+                                                            option(value="cix") Transition to subProfile on Execute with Inherit Fallback
+                                                            option(value="Cix") Transition to subProfile on Execute with Inherit Fallback - Scrub the Environment
+                                                            option(value="pux") Discrete Profile Execute with Fallback to unconfined
+                                                            option(value="PUx") Discrete Profile Execute with Fallback to unconfined - Scrub the Environment
+                                                            option(value="cux") Transition to subProfile on Execute with Fallback to Unconfined
+                                                            option(value="CUx") Transition to subProfile on Execute with Fallback to Unconfined - Scrub the Environment
+                                                            option(value="deny x") DisAllow Execute
+                                                            option(value="m") Allow PROT_EXEC with mmap(2) calls
+                                                            option(value="l") Link
+                                                            option(value="k") Lock
                                                     .mb-2
                                                           br
                                                           button.btn.btn-primary
                                                               i.fa.fa-plus
-                                                              | &nbsp;Add to Group
+                                                              | &nbsp;Add to Command Set
                                   #pills-add-group.tab-pane.fade(role='tabpanel', aria-labelledby='pills-add-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
-                                            form(method='POST' action='/utils/group-add')
+                                            form(method='POST' action='/utils/command-set-add')
                                                 .mb-2
-                                                    .col-form-label Enter new group name:
-                                                    input.form-control(type='text', placeholder='Group Name' name='group_name' required)
+                                                    .col-form-label Enter New Command Set Name:
+                                                    input.form-control(type='text', placeholder='Command Set Name ...' name='command_set_name' required)
                                                 .mb-2
                                                     br
                                                     button.btn.btn-primary
@@ -91,12 +114,12 @@ html(lang='en')
                                   #pills-delete-group.tab-pane.fade(role='tabpanel', aria-labelledby='pills-delete-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
-                                            form(method='POST' action='/utils/group-delete')
+                                            form(method='POST' action='/utils/command-set-delete')
                                                 .mb-2
-                                                    .col-form-label Select Group:
+                                                    .col-form-label Select Command Set:
                                                     select.js-example-basic-multiple.col-sm-12(name='groups' multiple='multiple' style="width: 100%" required)
-                                                        if groups
-                                                            each val in groups
+                                                        if command_sets
+                                                            each val in command_sets
                                                                 option(value=val.name)=val.name
                                                 .mb-2
                                                     br
@@ -104,43 +127,39 @@ html(lang='en')
                                                         i.fa.fa-trash
                                                         | &nbsp; Delete Groups
                                                 
-                    
-                    if groups.length > 0
+                    if command_sets.length > 0
                         .row
                             .col-sm-12
                                 .card.height-equal
                                   .card-header
-                                    h5 Groups
+                                    h5 Command Sets
                                   .card-body      
                                     div(id="accordion")
-                                        each g in groups
+                                        each g in command_sets
                                             .card
-                                                .card-header.card-body(id="heading"+g.name)
+                                                .card-header(id="heading"+g.name)
                                                     h5.card-title
                                                         button.btn.btn-lg.btn-link(data-toggle="collapse" data-target="#collapse"+g.name aria-expanded="true" aria-controls="collapse"+g.name)
                                                             Collapsible #{g.name}
                                                 .collapse(id="collapse"+g.name aria-labelledby="heading"+g.name data-parent="#accordion")
                                                     .card-body
                                                         .table-responsive
-                                                            if g.members.length > 0
+                                                            if g.commands.length > 0
                                                                 table(id="table"+g.name).display
                                                                     thead
                                                                         tr
-                                                                            th Name
-                                                                            th MAICS Role
-                                                                            th Email
-                                                                            th Remove From Group
+                                                                            th Path
+                                                                            th Access Mode
                                                                     tbody
-                                                                        each u in g.members
+                                                                        each c in g.commands
                                                                             tr
-                                                                                td=u.name + " " + u.surname
-                                                                                td=u.role
-                                                                                td=u.email
+                                                                                td=c.path
+                                                                                td=c.access_mode
                                                                                 td
                                                                                     button.btn.btn-danger.fa.fa-trash(style="width: 100%" onclick="confirm('"+u.sys_username+"', '" + u.email + "', '"+g.name+"');")
                                                             else
                                                                 p
-                                                                |    Group #{g.name} has no members yet 
+                                                                |    Command Set #{g.name} has no members yet 
                                                                 
                                     
                             
@@ -173,7 +192,7 @@ html(lang='en')
                   }
                 })
             }
-        each g in groups
+        each g in command_sets
             script(type='text/javascript').
                 $('#table#{g.name}').DataTable({
                         "scrollX": false

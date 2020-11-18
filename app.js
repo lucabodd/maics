@@ -33,6 +33,7 @@ var utilsHostsRouter = require('./routes/utils/hosts');
 var utilsRolesRouter = require('./routes/utils/roles');
 var utilsHostgroupsRouter = require('./routes/utils/hostgroups');
 var utilsAccessRouter = require('./routes/utils/access');
+var utilsConfinementRouter = require('./routes/utils/confinement');
 
 var session = require('express-session');
 
@@ -97,6 +98,7 @@ app.use('/utils/', utilsHostsRouter);
 app.use('/utils/', utilsRolesRouter);
 app.use('/utils/', utilsHostgroupsRouter);
 app.use('/utils/', utilsAccessRouter);
+app.use('/utils/', utilsConfinementRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

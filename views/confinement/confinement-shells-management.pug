@@ -41,34 +41,59 @@ html(lang='en')
                     // Container-fluid starts
                     .container-fluid
                       .row
-                        .col-md-6
+                        .col-md-12
                             .card
                               .card-header
-                                h5 User to Host
+                                h5 Create New Shell
                               .card-body
-                                  .select2-drpdwn
-                                    form(method='POST' action='/utils/access-user2host').form.theme-form
-                                        .col-form-label Select Users:
-                                        select.js-example-basic-multiple.col-sm-12(name='user' multiple='multiple' style="width: 100%" required)
-                                            if users
-                                                each h in users
-                                                    option(value=h)=h.name+" "+h.surname
-                                        .col-form-label Select Hosts:
-                                        select.js-example-basic-multiple.col-sm-12(name='host' multiple='multiple' style="width: 100%" required)
-                                            if hosts
-                                                each val in hosts
-                                                    option(value=val)=val.hostname
-                                        br
-                                        br
-                                        button.btn.btn-primary
-                                            i.fa.fa-plus
-                                            |&nbsp; Grant access   
+                                 .row
+                                   .col-sm-8
+                                      .select2-drpdwn
+                                        form(method='POST' action='/utils/access-user2host').form.theme-form
+                                            .form-group
+                                                label(for='f1-shell-name') Shell Name: &nbsp;
+                                                input#f1-first-name.form-control(type='text', name='shell_name', placeholder='Shell Name...', required)
+                                            .form-group
+                                                label(for='f1-command-sets') Allowed Command Sets:
+                                                select#f1-command-sets.js-example-basic-multiple.col-sm-12(name='command_sets' multiple='multiple' style="width: 100%" required)
+                                                    if hosts
+                                                        each val in hosts
+                                                            option(value=val)=val.hostname
+                                            .form-group
+                                                button.btn.btn-primary
+                                                    i.fa.fa-plus
+                                                    |&nbsp; Create Shell  
+                                        
+                                   .col-sm-4
+                                        .card
+                                             .card-body
+                                              h6 Shell Mode:
+                                              .row.switch-showcase.height-equal
+                                                .col-sm-12
+                                                  .media
+                                                    label.col-form-label.m-r-10 Enforce
+                                                    .media-body.text-right.icon-state
+                                                      label.switch
+                                                        input.checkbox(type='checkbox')
+                                                        span.switch-state
+                                                  .media
+                                                    label.col-form-label.m-r-10 Complain
+                                                    .media-body.text-right.icon-state
+                                                      label.switch
+                                                        input.checkbox(type='checkbox', checked='')
+                                                        span.switch-state
+                                                  .media
+                                                    label.col-form-label.m-r-10 Disabled
+                                                    .media-body.text-right.icon-state
+                                                      label.switch
+                                                        input.checkbox(type='checkbox')
+                                                        span.switch-state 
                         
                     .row  
                         .col-sm-12
                             .card
                                 .card-header
-                                    h5.card-title User Access list
+                                    h5.card-title Available Restricted Shells
                                 .card-body
                                         .table-responsive
                                                 table#basic-1.display
@@ -94,6 +119,9 @@ html(lang='en')
                 include ../../components/footer
         include ../../components/footer-files
         script(type='text/javascript').
+            $('input.checkbox').on('change', function() {
+                $('input.checkbox').not(this).prop('checked', false);  
+            });
             function confirm(email, host, sys_username)
             {
                 Swal.fire({

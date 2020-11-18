@@ -116,7 +116,7 @@ html(lang='en')
                                     div(id="accordion")
                                         each g in hostgroups
                                             .card
-                                                .card-header(id="heading"+g.name)
+                                                .card-header.card-body(id="heading"+g.name)
                                                     h5.card-title
                                                         button.btn.btn-lg.btn-link(data-toggle="collapse" data-target="#collapse"+g.name aria-expanded="true" aria-controls="collapse"+g.name)
                                                             Collapsible #{g.name}
