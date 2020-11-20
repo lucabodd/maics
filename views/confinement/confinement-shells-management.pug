@@ -46,87 +46,99 @@ html(lang='en')
                               .card-header
                                 h5 Create New Shell
                               .card-body
-                                 .row
-                                   .col-sm-8
-                                      .select2-drpdwn
-                                        form(method='POST' action='/utils/access-user2host').form.theme-form
-                                            .form-group
-                                                label(for='f1-shell-name') Shell Name: &nbsp;
-                                                input#f1-first-name.form-control(type='text', name='shell_name', placeholder='Shell Name...', required)
-                                            .form-group
-                                                label(for='f1-command-sets') Allowed Command Sets:
-                                                select#f1-command-sets.js-example-basic-multiple.col-sm-12(name='command_sets' multiple='multiple' style="width: 100%" required)
-                                                    if hosts
-                                                        each val in hosts
-                                                            option(value=val)=val.hostname
-                                            .form-group
-                                                button.btn.btn-primary
-                                                    i.fa.fa-plus
-                                                    |&nbsp; Create Shell  
+                                 
+                                        form(method='POST' action='/utils/shell-add').form.theme-form
+                                            .row
+                                              .col-sm-8
+                                                    .form-group
+                                                        label(for='f1-shell-name') Shell Name: &nbsp;
+                                                        input#f1-first-name.form-control(type='text', name='shell_name', placeholder='Shell Name...', required)
+                                                    .select2-drpdwn
+                                                        .col-form-label Select Command Set:
+                                                        select.js-example-basic-multiple.col-sm-12(name='command_sets' multiple="multiple" style="width: 100%" required)
+                                                            if command_sets
+                                                              each c in command_sets
+                                                                  option(value=c.name)=c.name
+                                                    .form-group
+                                                        br
+                                                        button.btn.btn-primary
+                                                            i.fa.fa-plus
+                                                            |&nbsp; Create Shell  
                                         
-                                   .col-sm-4
-                                        .card
-                                             .card-body
-                                              h6 Shell Mode:
-                                              .row.switch-showcase.height-equal
-                                                .col-sm-12
-                                                  .media
-                                                    label.col-form-label.m-r-10 Enforce
-                                                    .media-body.text-right.icon-state
-                                                      label.switch
-                                                        input.checkbox(type='checkbox')
-                                                        span.switch-state
-                                                  .media
-                                                    label.col-form-label.m-r-10 Complain
-                                                    .media-body.text-right.icon-state
-                                                      label.switch
-                                                        input.checkbox(type='checkbox', checked='')
-                                                        span.switch-state
-                                                  .media
-                                                    label.col-form-label.m-r-10 Disabled
-                                                    .media-body.text-right.icon-state
-                                                      label.switch
-                                                        input.checkbox(type='checkbox')
-                                                        span.switch-state 
-                        
-                    .row  
-                        .col-sm-12
-                            .card
-                                .card-header
-                                    h5.card-title Available Restricted Shells
-                                .card-body
-                                        .table-responsive
-                                                table#basic-1.display
-                                                    thead
-                                                        tr
-                                                            th User
-                                                            th System Name
-                                                            th E-mail
-                                                            th Host
-                                                            th Delete
-                                                    tbody
-                                                        if access
-                                                            each u in access
+                                              .col-sm-4
+                                                .card
+                                                     .card-body
+                                                      h6 Shell Mode:
+                                                      .row.switch-showcase.height-equal
+                                                        .col-sm-12
+                                                          .media
+                                                            label.col-form-label.m-r-10 Enforce
+                                                            .media-body.text-right.icon-state
+                                                              label.switch
+                                                                input.checkbox(type='checkbox' name="enforce")
+                                                                span.switch-state
+                                                          .media
+                                                            label.col-form-label.m-r-10 Complain
+                                                            .media-body.text-right.icon-state
+                                                              label.switch
+                                                                input.checkbox(type='checkbox', checked='' name="complain")
+                                                                span.switch-state
+                                                          .media
+                                                            label.col-form-label.m-r-10 Disabled
+                                                            .media-body.text-right.icon-state
+                                                              label.switch
+                                                                input.checkbox(type='checkbox' name="disabled")
+                                                                span.switch-state 
+                    
+                    if confinement_shells.length > 0    
+                        .row  
+                            .col-sm-12
+                                .card
+                                    .card-header
+                                        h5.card-title Available Restricted Shells 
+                                    .card-body
+                                            .table-responsive
+                                                    table#basic-1.display
+                                                        thead
+                                                            tr
+                                                                th Name
+                                                                th Mode
+                                                                th Command Sets
+                                                                th Edit
+                                                                th Delete
+                                                        tbody
+                                                            each cs in confinement_shells
                                                                 tr
-                                                                    td=u.name + " " + u.surname
-                                                                    td=u.sys_username
-                                                                    td=u.email
-                                                                    td=u.hostname
+                                                                    td=cs.name
+                                                                    td=cs.mode
+                                                                    td=cs.command_sets.join(" ")
+                                                                    td(style="width:  2%;")
+                                                                        .dropdown.dropleft
+                                                                            button.dropbtn.btn-warning(type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
+                                                                                i.fa.fa-pencil.dropdown-toggle-split
+                                                                            div.dropdown-menu(aria-labelledby="dropdownMenuButton")
+                                                                                h6.dropdown-header Edit #{cs.name} shell
+                                                                                .dropdown-divider
+                                                                                button.dropdown-item.btn.btn-light.txt-dark(onclick="change_shell_mode('"+cs.name+"')" style="border-radius: 0px;") Change Shell Mode
+                                                                                button.dropdown-item.btn.btn-light.txt-dark(onclick="add_command_set('"+cs.name+"','"+command_sets_names.join(",")+"','"+cs.command_sets.join(",")+"')" style="border-radius: 0px;") Add Command Set
+                                                                                button.dropdown-item.btn.btn-light.txt-dark(onclick="delete_command_set('"+cs.name+"','"+cs.command_sets.join(",")+"')" style="border-radius: 0px;") Delete Command Set
+
                                                                     td(style="width:  2%;").mx-auto
-                                                                        button.btn.btn-danger.fa.fa-trash(onclick="confirm('" + u.email + "', '"+u.hostname+"', '"+u.sys_username+"');")
-                                
+                                                                        button.btn.btn-danger.fa.fa-trash(onclick="confirm('" + cs.name + "');")
+                                    
                     // Container-fluid Ends
                 include ../../components/footer
         include ../../components/footer-files
+        style(type="text/css").
+            .select2-container--open {
+                z-index: 99999999999999;
+            }
         script(type='text/javascript').
-            $('input.checkbox').on('change', function() {
-                $('input.checkbox').not(this).prop('checked', false);  
-            });
-            function confirm(email, host, sys_username)
+            function confirm(shell)
             {
                 Swal.fire({
                       title: 'Are you sure?',
-                      text: "You won't be able to revert this!",
+                      text: "Deleting this shell will also reset loginShell value to default /bin/bash for all users assiged to!",
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#3085d6',
@@ -134,7 +146,10 @@ html(lang='en')
                       confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                   if (result.value) {
-                    window.location.replace("/utils/access-user-delete?email=" + email+"&hostname="+host+"&sys_username="+sys_username);
+                      var form = $('<form action="/utils/shell-delete" method="post">' +
+                                    '<input type="hidden" name="shell" value='+shell+'></form>');
+                      $('body').append(form);
+                      form.submit();
                   }
                   else if (result.dismiss === Swal.DismissReason.cancel) {
                     Swal.fire({
@@ -147,5 +162,171 @@ html(lang='en')
                   }
              });
             } 
+        
+            function change_shell_mode(shell)
+            {
+                Swal.fire({
+                  title: 'Change Shell Mode',
+                  html: `<p> Note that if you enforce a shell, a user can use only the command sets assigned to this shell. At least a value must be specified. <\p>
+                            <div class="card-body">
+                            <h6>Shell Mode:</h6>
+                            <div class="row switch-showcase height-equal">
+                                <div class="col-sm-12">
+                                    <div class="media">
+                                    <label class="col-form-label m-r-10">Enforce</label>
+                                    <div class="media-body text-right icon-state">
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" id="enforce" name="enforce"><span class="switch-state"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="media">
+                                <label class="col-form-label m-r-10">Complain</label>
+                                <div class="media-body text-right icon-state">
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" id="complain" name="complain"><span class="switch-state"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="media">
+                                <label class="col-form-label m-r-10">Disabled</label>
+                                <div class="media-body text-right icon-state">
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" id="disabled" name="disabled"><span class="switch-state"> </span>
+                                    </label>
+                                </div>
+                            </div>
+                            </div></div></div>`,
+                  confirmButtonText: 'Change Shell Mode',
+                  focusConfirm: false,
+                  preConfirm: () => {
+                    const enforce = Swal.getPopup().querySelector('#enforce').checked
+                    const complain = Swal.getPopup().querySelector('#complain').checked
+                    const disabled = Swal.getPopup().querySelector('#disabled').checked
+                    
+                    validation_arr = [enforce,complain,disabled];
+                    on_count = validation_arr.filter(function(value){
+                        return value === true;
+                    }).length 
+                    console.log(on_count);
+                    console.log(enforce);
+                    console.log(complain);
+                    console.log(disabled);
+                    console.log(validation_arr);
+                    if (on_count > 1) {
+                        Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
+                    }
+                    if (!enforce && !complain && !disabled) {
+                      Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
+                    }
+                    var mode=""
+                    if (enforce){
+                        mode="enforce"
+                    }
+                    else if (complain){
+                        mode="complain"
+                    }
+                    else {
+                        mode="disable"
+                    }
+                    return { mode: mode }
+                  }
+                }).then((result) => {
+                    var form = $(`<form action="/utils/change-shell-mode" method="post">` +
+                                  `<input type="hidden" name="confinement_shell" value="`+shell+`">` +
+                                  `<input type="hidden" name="mode" value="`+result.value.mode+`"></form>`);
+                    $('body').append(form);
+                    form.submit();
+                })
+            }
+            function add_command_set(shell, available_command_sets, shell_command_sets)
+            {
+                available_command_sets = available_command_sets.split(",");
+                shell_command_sets =shell_command_sets.split(",");
+                
+                //subtract command sets assignet to current shell
+                //from all available command sets (avoid duplicates)
+                options_command_sets = available_command_sets.filter(function(n) {
+                    return shell_command_sets.indexOf(n) === -1;
+                })
+                
+                //generate HTML
+                options_html_array = options_command_sets.map(function(el){
+                    return "<option value='"+el+"'>"+el+"</option>"
+                });
+                
+                if(options_html_array.length > 0 )
+                    select_options_html = "<select class='js-example-basic-single' id='command_set' name='command_set' style='width:100%' required><option value='unselected' selected disabled>Select a Command Set ...</option>"+options_html_array.join("")+"</select>"; 
+                else 
+                    select_options_html = "<span>There is no available command set you can assign to this shell.</span>"
+                
+                Swal.fire({
+                  title: 'Add Command Set to '+shell,
+                  html: `<p> Add command set to a predefined shell, please consider that shell generation and update can take some time. <\p>`+select_options_html,
+                  confirmButtonText: 'Add Command Set',
+                  focusConfirm: false,
+                  showCancelButton: true,
+                  onOpen: function(){$(".js-example-basic-single").select2();},
+                  preConfirm: () => {
+                    const command_set = Swal.getPopup().querySelector('#command_set').value
+    
+                    if (command_set == 'unselected') {
+                      Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
+                    }
             
+                    return { command_set: command_set }
+                  }
+                }).then((result) => {
+                    var form = $(`<form action="/utils/shell-add-command-set" method="post">` +
+                                  `<input type="hidden" name="confinement_shell" value="`+shell+`">` +
+                                  `<input type="hidden" name="command_set" value="`+result.value.command_set+`"></form>`);
+                    $('body').append(form);
+                    form.submit();
+                })
+            }
+            function delete_command_set(shell, available_command_sets)
+            {
+                available_command_sets = available_command_sets.split(",");
+
+                if (available_command_sets[0]!="")//empty array
+                {
+                    //generate HTML
+                    options_html_array = available_command_sets.map(function(el){
+                        return "<option value='"+el+"'>"+el+"</option>"
+                    });
+                    select_options_html = "<select class='js-example-basic-single' id='command_set' name='command_set' style='width:100%' required><option value='unselected' selected disabled>Select a Command Set ...</option>"+options_html_array.join("")+"</select>"; 
+                }
+                else
+                {
+                    select_options_html = "<span>No command sets are assigned to this shell</span>"
+                }
+                
+                Swal.fire({
+                  title: 'Delete Command Set from: '+shell,
+                  html: `<p> Delete a command set from a shell, this will remove commands from security profile. <\p>`+select_options_html,
+                  confirmButtonText: 'Delete Command Set',
+                  showCancelButton: true,
+                  focusConfirm: false,
+                  onOpen: function(){$(".js-example-basic-single").select2();},
+                  preConfirm: () => {
+                    const command_set = Swal.getPopup().querySelector('#command_set').value
+    
+                    if (command_set == 'unselected') {
+                      Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
+                    }
+            
+                    return { command_set: command_set }
+                  }
+                }).then((result) => {
+                    var form = $(`<form action="/utils/shell-delete-command-set" method="post">` +
+                                  `<input type="hidden" name="confinement_shell" value="`+shell+`">` +
+                                  `<input type="hidden" name="command_set" value="`+result.value.command_set+`"></form>`);
+                    $('body').append(form);
+                    form.submit();
+                })
+            }
+            //only one check selected
+            $('input.checkbox').on('change', function() {
+                $('input.checkbox').not(this).prop('checked', false);  
+            });
     

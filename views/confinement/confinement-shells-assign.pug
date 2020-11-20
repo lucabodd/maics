@@ -1,0 +1,155 @@
+- var select2               = true;
+- var page_select2          = true;
+- var sidebar_open          = true;
+- var sweetalert2           = true;
+- var err_handling          = true;
+- var pe7_icon              = true;
+- var datatable             = true;
+- var page_datatable        = true;
+- var popover_custom        = true;
+- var form_wizard_three     = true;
+
+doctype html
+html(lang='en')
+    include ../../components/header-files
+    //pincodeInput
+    link(rel='stylesheet', type='text/css', href='../../assets/css/bootstrap-pincode-input.css')
+    body
+        include ../../components/loader
+        // page-wrapper Start
+        .page-wrapper
+            include ../../components/header
+            // Page Body Start
+            .page-body-wrapper
+                include ../../components/sidebar
+                .page-body
+                    .container-fluid
+                        .page-header
+                            .row
+                                .col-lg-6.main-header
+                                    h2
+                                      | Assign Shell
+                                    h6.mb-0 Assign Restricted Shells
+                                .col-lg-6.breadcrumb-right      
+                                    ol.breadcrumb
+                                      li.breadcrumb-item
+                                        a(href='/users/management')
+                                         i.pe-7s-home
+                                      li.breadcrumb-item.active users
+                    // Container-fluid starts
+                    .container-fluid
+                      .row
+                        .col-md-6
+                            .card
+                              .card-header
+                                h5 User to Shell
+                                span Confine a user to a restricted shell. If the shell is in enforce mode user will only be able to execute defined commands.
+                              .card-body
+                                  .select2-drpdwn
+                                    form(method='POST' action='/utils/shell-assign-user-add').form.theme-form
+                                        .col-form-label Select Users:
+                                        select.js-addshell.col-sm-12( name='sys_username' multiple='multiple' style="width: 100%" required)
+                                            if users 
+                                                each h in users        
+                                                    option(value=h.sys_username)=h.name+" "+h.surname
+                                        .col-form-label Select Shell:
+                                        select.js-example-basic-single.col-sm-12(name='shell'  style="width: 100%" required)
+                                            if confinement_shells
+                                                option(selected disabled) Select shell ...
+                                                each val in confinement_shells
+                                                    option(value="/opt/maics/"+val.name)=val.name
+                                        br
+                                        br
+                                        button.btn.btn-primary
+                                            i.fa.fa-plus
+                                            |&nbsp; Assign shell 
+                        .col-md-6
+                            .card
+                              .card-header
+                                h5 Group to Shell
+                                span This will not assign a 'group-shell', performing this action will just assign the same shell to a group of users
+                              .card-body
+                                  .select2-drpdwn
+                                        form(method='POST' action='/utils/shell-assign-group-add')
+                                            .col-form-label Select Group:
+                                            select.js-example-basic-single.col-sm-12(name='group'  style="width: 100%" required)
+                                                if groups
+                                                    option(selected disabled) Select group...
+                                                    each g in groups
+                                                        option(value=g.name)=g.name
+                                            .col-form-label Select Shell:
+                                            select.js-example-basic-single.col-sm-12(name='shell' style="width: 100%" required)
+                                                if confinement_shells
+                                                    option(selected disabled) Select shell...
+                                                    each val in confinement_shells
+                                                        option(value="/opt/maics/"+val.name)=val.name
+                                            br
+                                            br
+                                            button.btn.btn-primary
+                                                i.fa.fa-plus
+                                                |&nbsp; Assign shell
+                        
+                    .row  
+                        .col-sm-12
+                            .card
+                                .card-header
+                                    h5.card-title User Access list
+                                .card-body
+                                        .table-responsive
+                                                table#basic-1.display
+                                                    thead
+                                                        tr
+                                                            th User
+                                                            th System Name
+                                                            th E-mail
+                                                            th Shell
+                                                            th Remove assignment
+                                                    tbody
+                                                        if users
+                                                            each u in users
+                                                                tr
+                                                                    td=u.name + " " + u.surname
+                                                                    td=u.sys_username
+                                                                    td=u.email
+                                                                    td=u.loginShell
+                                                                    if (u.loginShell != '/bin/bash')
+                                                                        td(style="width:  2%;").mx-auto
+                                                                            button.btn.btn-danger.fa.fa-trash(onclick="confirm('" + u.sys_username + "');")
+                                    
+                                                                    else
+                                                                        td(style="width:  2%;").mx-auto
+                                                                            button.btn.btn-light.fa.fa-trash(disabled)
+                    // Container-fluid Ends
+                include ../../components/footer
+        include ../../components/footer-files
+        script(type='text/javascript').
+            function confirm(sys_username)
+            {
+                Swal.fire({
+                      title: 'Are you sure?',
+                      text: "login shell will be resetted to default value!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.value) {
+                      var form = $('<form action="/utils/shell-assign-user-delete" method="post">' +
+                                    '<input type="hidden" name="sys_username" value='+sys_username+'></form>');
+                      $('body').append(form);
+                      form.submit();
+                  }
+                  else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Canceled',
+                        text: "Access elimination aborted.",
+                        icon: 'success',
+                        timer: 1000,
+                        timerProgressBar: true
+                      })
+                  }
+             });
+            } 
+            
+    

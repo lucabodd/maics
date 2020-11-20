@@ -75,10 +75,10 @@ router.get('/verify-otp', function (req, res, next) {
                                     gen_hash= data.digest('hex');
                                     req.session.otp_secret_hash = gen_hash;
                                 }
-                                res.redirect("/home/keys?error=false");
+                                res.redirect("/keys/management?error=false");
                             }
                             else {
-                                res.redirect("/home/keys?error=true&code=\'SK010\'");
+                                res.redirect("/keys/management?error=true&code=\'SK010\'");
                             }
                         },
                         function(err){
@@ -110,10 +110,10 @@ router.post('/verify-token', function (req, res, next) {
                             gen_hash= data.digest('hex');
                             req.session.token_secret_hash = gen_hash;
                         }
-                        res.redirect("/home/keys?error=false");
+                        res.redirect("/keys/management?error=false");
                     }
                     else{
-                        res.redirect("/home/keys?error=true&code=\'SK010\'");
+                        res.redirect("/keys/management?error=true&code=\'SK010\'");
                     }
                 },
                 function(err){
@@ -147,7 +147,7 @@ router.post('/key-unlock', function (req, res, next) {
                                     {
                                         log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
                                         log("[+] User "+req.session.email+" successfully unlocked his SSH key. request occurred from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                        res.redirect("/home/keys?error=false");
+                                        res.redirect("/keys/management?error=false");
                                     }
                                     else{
                                         log("[+] MAICS is decripting "+req.session.email+" key", app_log);
@@ -155,7 +155,7 @@ router.post('/key-unlock', function (req, res, next) {
                                         if(user.sshPublicKey == "")
                                         {
                                             log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
-                                            res.redirect("/home/keys?error=false");
+                                            res.redirect("/keys/management?error=false");
                                         }
                                         else if(user.sshPublicKey.indexOf("ssh-rsa") == -1)
                                         {
@@ -172,7 +172,7 @@ router.post('/key-unlock', function (req, res, next) {
                                                                     function(succ){
                                                                         log("[+] SKDC successfully decrypted "+req.session.email+" key", app_log);
                                                                         log("[+] User "+user.email+" public key unlocked in specified timestamp by OTP authentication", journal_log);
-                                                                        res.redirect("/home/keys?error=false");
+                                                                        res.redirect("/keys/management?error=false");
                                                                     },
                                                                     function(err){
                                                                         log('[-] Connection to LDAP has been established, but no query can be performed, reason: '+err.message, app_log);
@@ -188,7 +188,7 @@ router.post('/key-unlock', function (req, res, next) {
                                         }
                                         else{
                                             log("[+] MAICS key of "+req.session.email+" already decrypted, last unlock time: "+user.key_last_unlock+" no decryption needed.", app_log);
-                                            res.redirect("/home/keys?error=false");
+                                            res.redirect("/keys/management?error=false");
                                         }
                                     }
                                 },
@@ -199,7 +199,7 @@ router.post('/key-unlock', function (req, res, next) {
                             );
                     }
                     else{
-                        res.redirect("/home/keys?error=true&code=\'SK010\'");
+                        res.redirect("/keys/management?error=true&code=\'SK010\'");
                     }
                 },
                 function(err){
@@ -226,11 +226,11 @@ router.get('/key-enroll-otp-secret', function (req, res, next) {
                                 function () {
                                     log("[+] User "+req.session.email+" successfully saved OTP secret.", app_log);
                                     log("[+] User "+req.session.email+" successfully saved OTP secret at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                    res.redirect('/home/2fa?error=false');
+                                    res.redirect('/keys/2fa?error=false');
                                 },
                                 function (err) {
                                     log('[-] Connection cannot update key on MongoDB, reason: '+err.message, app_log);
-                                    res.redirect('/home/2fa?error=true&code=\'DM001\'');
+                                    res.redirect('/keys/2fa?error=true&code=\'DM001\'');
                                 }
                             )
                     },
@@ -257,11 +257,11 @@ router.post('/key-enroll-token-secret', function (req, res, next) {
                                 function () {
                                     log("[+] User "+req.session.email+" successfully saved token secret.", app_log);
                                     log("[+] User "+req.session.email+" successfully saved OTP secret at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                    res.redirect('/home/2fa?error=false');
+                                    res.redirect('/keys/2fa?error=false');
                                 },
                                 function (err){
                                     log('[-] Connection cannot update key on MongoDB, reason: '+err.message, app_log);
-                                    res.redirect('/home/2fa?error=true&code=\'DM001\'');
+                                    res.redirect('/keys/2fa?error=true&code=\'DM001\'');
                                 }
                             );
                     },
@@ -289,11 +289,11 @@ router.post('/key-upload', function (req, res, next) {
                                         // TODO 5 Add to ansible event queue (if user exists, update keys)
                                         log("[+] User "+email+" successfully changed ssh key.", app_log);
                                         log("[+] User "+email+" update ssh public key at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                                        res.redirect('/home/keys?error=false');
+                                        res.redirect('/keys/management?error=false');
                                     },
                                     function (err) {
                                         log('[-] Connection cannot update key on MongoDB or LDAP, reason: '+err.message, app_log);
-                                        res.redirect('/home/keys?error=true&code=\'DA001\'');
+                                        res.redirect('/keys/management?error=true&code=\'DA001\'');
                                     }
                                 )
                         },

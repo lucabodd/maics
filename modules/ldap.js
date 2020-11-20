@@ -165,6 +165,40 @@ LDAP.prototype.modKey = function (uid, sshPublicKey)
     });
 }
 
+LDAP.prototype.modLoginShell = function (uid, shell)
+{
+    var _this = this
+    return new Promise(function(resolve, reject){
+        client = ldap.createClient(_this.clientOptions);
+        client.bind(_this.ldap_bind_username, _this.ldap_bind_password, function(err) {
+            if (err)
+            {
+                log('[-] Error occurred while binding'+ err.message,ldap_log);
+                reject();
+            }
+            else
+            {
+                var change = new ldap.Change({
+                    operation: 'replace',
+                    modification: {
+                        loginShell: shell
+                    }
+                });
+                client.modify("uid="+uid+","+_this.ldap_base_users, change,function(err) {
+                    if(err){
+                        log('[-] Error occurred while modifing '+ err.message,ldap_log);
+                        reject(err);
+                    }
+                    else{
+                        log('[+] User loginShell modified',ldap_log);
+                        resolve();
+                    }
+                });
+            }
+        });
+    });
+}
+
 LDAP.prototype.lockAccount = function (uid)
 {
     var now = new Date();

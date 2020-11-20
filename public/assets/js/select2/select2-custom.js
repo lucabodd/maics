@@ -13,6 +13,9 @@ setTimeout(function(){
             $(".js-adduser-multiple").select2({
                 placeholder: "Select groups..."
             });
+            $(".js-addshell").select2({
+                placeholder: "Select users..."
+            });
             //Limited Numbers
             $(".js-example-basic-multiple-limit").select2({
                 maximumSelectionLength: 2

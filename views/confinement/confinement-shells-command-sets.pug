@@ -57,13 +57,14 @@ html(lang='en')
                                   #pills-add-user-to-group.tab-pane.fade.show.active(role='tabpanel', aria-labelledby='pills-add-user-to-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
-                                                form(method='POST' action='/utils/command-set-add-command')
+                                                form(method='POST' action='/utils/command-set-add-command').form.theme-form
                                                     .mb-2
                                                         .col-form-label Select Command Set:
-                                                        select.js-example-basic-multiple.col-sm-12(name='users' multiple='multiple' style="width: 100%" required)
+                                                        select.js-example-basic-single.col-sm-12(name='command_set' style="width: 100%" required)
+                                                            option(disabled selected) Select Command Set...
                                                               if command_sets
                                                                   each c in command_sets
-                                                                      option(value=c)=c.name
+                                                                      option(value=c.name)=c.name
                                                     .mb-2
                                                         .col-form-label Enter Path:
                                                         input.form-control(type='text', placeholder='Command Path...' name='command_path' required)
@@ -109,15 +110,15 @@ html(lang='en')
                                                     br
                                                     button.btn.btn-primary
                                                         i.fa.fa-plus 
-                                                        | &nbsp;Add Group
+                                                        | &nbsp;Add Command Set
                                       
                                   #pills-delete-group.tab-pane.fade(role='tabpanel', aria-labelledby='pills-delete-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
-                                            form(method='POST' action='/utils/command-set-delete')
+                                            form(method='POST' action='/utils/command-sets-delete')
                                                 .mb-2
                                                     .col-form-label Select Command Set:
-                                                    select.js-example-basic-multiple.col-sm-12(name='groups' multiple='multiple' style="width: 100%" required)
+                                                    select.js-example-basic-multiple.col-sm-12(name='command_sets' multiple='multiple' style="width: 100%" required)
                                                         if command_sets
                                                             each val in command_sets
                                                                 option(value=val.name)=val.name
@@ -125,7 +126,7 @@ html(lang='en')
                                                     br
                                                     button.btn.btn-danger
                                                         i.fa.fa-trash
-                                                        | &nbsp; Delete Groups
+                                                        | &nbsp; Delete Command Sets
                                                 
                     if command_sets.length > 0
                         .row
@@ -137,7 +138,7 @@ html(lang='en')
                                     div(id="accordion")
                                         each g in command_sets
                                             .card
-                                                .card-header(id="heading"+g.name)
+                                                .card-header.card-body(id="heading"+g.name)
                                                     h5.card-title
                                                         button.btn.btn-lg.btn-link(data-toggle="collapse" data-target="#collapse"+g.name aria-expanded="true" aria-controls="collapse"+g.name)
                                                             Collapsible #{g.name}
@@ -150,13 +151,14 @@ html(lang='en')
                                                                         tr
                                                                             th Path
                                                                             th Access Mode
+                                                                            th Delete
                                                                     tbody
                                                                         each c in g.commands
                                                                             tr
                                                                                 td=c.path
                                                                                 td=c.access_mode
                                                                                 td
-                                                                                    button.btn.btn-danger.fa.fa-trash(style="width: 100%" onclick="confirm('"+u.sys_username+"', '" + u.email + "', '"+g.name+"');")
+                                                                                    button.btn.btn-danger.fa.fa-trash(style="width: 100%" onclick="delete_command('"+c.path+"', '" + c.access_mode + "', '"+g.name+"');")
                                                             else
                                                                 p
                                                                 |    Command Set #{g.name} has no members yet 
@@ -167,30 +169,14 @@ html(lang='en')
                 include ../../components/footer
         include ../../components/footer-files
         script(type='text/javascript').
-            function confirm(sys_username, email, group)
+            function delete_command(path, access_mode, command_set)
             {
-                Swal.fire({
-                      title: 'Are you sure?',
-                      text: "User will lose privileges related to this group!",
-                      icon: 'warning',
-                      showCancelButton: true,
-                      confirmButtonColor: '#3085d6',
-                      cancelButtonColor: '#d33',
-                      confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                  if (result.value) {
-                    window.location.replace("/utils/group-delete-user?sys_username="+sys_username+"&email=" + email + "&group="+group);
-                  }
-                  else if (result.dismiss === Swal.DismissReason.cancel) {
-                    Swal.fire({
-                        title: 'Canceled',
-                        text: "Elimination from group aborted.",
-                        icon: 'success',
-                        timer: 1000,
-                        timerProgressBar: true
-                      })
-                  }
-                })
+                var form = $('<form action="/utils/command-set-delete-command" method="post">' +
+                              '<input type="hidden" name="command_path" value='+path+'>'+
+                              '<input type="hidden" name="command_set" value='+command_set+'>'+
+                              '<input type="hidden" name="access_mode" value='+access_mode+'></form>');
+                $('body').append(form);
+                form.submit();
             }
         each g in command_sets
             script(type='text/javascript').
