@@ -51,21 +51,33 @@ router.post('/command-set-add', function (req, res, next) {
 });
 
 router.post('/command-set-add-command', function (req, res, next) {
-        mdb.connect(mongo_instance)
-            .then(
-                function () {
-                    mdb.updDocument("command_sets", { name: req.body.command_set} , { $push : { commands: { path: req.body.command_path, access_mode: req.body.access_mode }}})
-                        .then(
-                            function () {
-                                res.redirect('/confinement/shells/command-sets?error=false');
-                            },
-                            function (err) {
-                                res.redirect('/confinement/shells/command-sets?error=true');
-                            }
-                        );
-                },
-                function(err) { errors.mdb_connection_refused(res, err); }
-            );
+        allow = req.body.allow
+        deny = req.body.deny
+        command = req.body.command_path
+
+        if (!allow && !deny){
+            res.redirect('/confinement/shells/management?command-sets=true');
+        }
+        else{
+            mdb.connect(mongo_instance)
+                .then(
+                    function () {
+                        if(deny=="on"){
+                            command="deny "+command
+                        }
+                        mdb.updDocument("command_sets", { name: req.body.command_set} , { $push : { commands: { path: command, access_mode: req.body.access_mode }}})
+                            .then(
+                                function () {
+                                    res.redirect('/confinement/shells/command-sets?error=false');
+                                },
+                                function (err) {
+                                    res.redirect('/confinement/shells/command-sets?error=true');
+                                }
+                            );
+                    },
+                    function(err) { errors.mdb_connection_refused(res, err); }
+                );
+        }
 });
 
 router.post('/command-set-delete-command', function (req, res, next) {

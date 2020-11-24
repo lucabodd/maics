@@ -58,47 +58,70 @@ html(lang='en')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
                                                 form(method='POST' action='/utils/command-set-add-command').form.theme-form
-                                                    .mb-2
-                                                        .col-form-label Select Command Set:
-                                                        select.js-example-basic-single.col-sm-12(name='command_set' style="width: 100%" required)
-                                                            option(disabled selected) Select Command Set...
-                                                              if command_sets
-                                                                  each c in command_sets
-                                                                      option(value=c.name)=c.name
-                                                    .mb-2
-                                                        .col-form-label Enter Path:
-                                                        input.form-control(type='text', placeholder='Command Path...' name='command_path' required)
-                                                    .mb-2
-                                                        .col-form-label Access Mode:
-                                                        select.js-example-basic-single.col-sm-12(name='access_mode' style="width: 100%" required)
-                                                            option(disabled selected) Select Access Mode...
-                                                            option(value="r") Read
-                                                            option(value="w") Write
-                                                            option(value="a") Append
-                                                            option(value="ux") Unconfined Execute
-                                                            option(value="Ux") Unconfined Execute - Scrub the Environment
-                                                            option(value="px") Discrete Profile Execute
-                                                            option(value="Px") Discrete Profile Execute - Scrub the Environment
-                                                            option(value="cx") Transition to Subprofile on Execute
-                                                            option(value="Cx") Transition to Subprofile on Execute - Scrub the Environment
-                                                            option(value="ix") Inherit Execute
-                                                            option(value="pix") Discrete Profile Execute with Inherit Fallback
-                                                            option(value="Pix") Discrete Profile Execute with Inherit Fallback - Scrub the Environment
-                                                            option(value="cix") Transition to subProfile on Execute with Inherit Fallback
-                                                            option(value="Cix") Transition to subProfile on Execute with Inherit Fallback - Scrub the Environment
-                                                            option(value="pux") Discrete Profile Execute with Fallback to unconfined
-                                                            option(value="PUx") Discrete Profile Execute with Fallback to unconfined - Scrub the Environment
-                                                            option(value="cux") Transition to subProfile on Execute with Fallback to Unconfined
-                                                            option(value="CUx") Transition to subProfile on Execute with Fallback to Unconfined - Scrub the Environment
-                                                            option(value="deny x") DisAllow Execute
-                                                            option(value="m") Allow PROT_EXEC with mmap(2) calls
-                                                            option(value="l") Link
-                                                            option(value="k") Lock
-                                                    .mb-2
+                                                    .row
+                                                        .col-sm-8
+                                                            .mb-2
+                                                                .col-form-label Select Command Set:
+                                                                select.js-example-basic-single.col-sm-12(name='command_set' style="width: 100%" required)
+                                                                    option(disabled selected) Select Command Set...
+                                                                      if command_sets
+                                                                          each c in command_sets
+                                                                              option(value=c.name)=c.name
+                                                            .mb-2
+                                                                    .col-form-label Enter Command/Files Path:
+                                                                    input.form-control(type='text', placeholder='Command Path...' name='command_path' required)
+                                                            .mb-2
+                                                                .col-form-label Access Mode:
+                                                                select.js-example-basic-single.col-sm-12(name='access_mode' style="width: 100%" required)
+                                                                    option(disabled selected) Select Access Mode...
+                                                                    option(value="r") Read
+                                                                    option(value="w") Write
+                                                                    option(value="a") Append
+                                                                    option(value="ux") Unconfined Execute
+                                                                    option(value="Ux") Unconfined Execute - Scrub the Environment
+                                                                    option(value="px") Discrete Profile Execute
+                                                                    option(value="Px") Discrete Profile Execute - Scrub the Environment
+                                                                    option(value="cx") Transition to Subprofile on Execute
+                                                                    option(value="Cx") Transition to Subprofile on Execute - Scrub the Environment
+                                                                    option(value="ix") Inherit Execute
+                                                                    option(value="pix") Discrete Profile Execute with Inherit Fallback
+                                                                    option(value="Pix") Discrete Profile Execute with Inherit Fallback - Scrub the Environment
+                                                                    option(value="cix") Transition to subProfile on Execute with Inherit Fallback
+                                                                    option(value="Cix") Transition to subProfile on Execute with Inherit Fallback - Scrub the Environment
+                                                                    option(value="pux") Discrete Profile Execute with Fallback to unconfined
+                                                                    option(value="PUx") Discrete Profile Execute with Fallback to unconfined - Scrub the Environment
+                                                                    option(value="cux") Transition to subProfile on Execute with Fallback to Unconfined
+                                                                    option(value="CUx") Transition to subProfile on Execute with Fallback to Unconfined - Scrub the Environment
+                                                                    option(value="deny x") DisAllow Execute
+                                                                    option(value="m") Allow PROT_EXEC with mmap(2) calls
+                                                                    option(value="l") Link
+                                                                    option(value="k") Lock
+                                                            .mb-2
+                                                                  br
+                                                                  button.btn.btn-primary
+                                                                      i.fa.fa-plus
+                                                                      | &nbsp;Add to Command Set
+                                                        .col-sm-4
                                                           br
-                                                          button.btn.btn-primary
-                                                              i.fa.fa-plus
-                                                              | &nbsp;Add to Command Set
+                                                          br
+                                                          .card
+                                                               .card-body
+                                                                h6 Access Mode:
+                                                                .row.switch-showcase.height-equal
+                                                                  .col-sm-12
+                                                                    .media
+                                                                      label.col-form-label.m-r-10 Allow
+                                                                      .media-body.text-right.icon-state
+                                                                        label.switch
+                                                                          input.checkbox(type='checkbox' checked='' name="allow")
+                                                                          span.switch-state
+                                                                    .media
+                                                                      label.col-form-label.m-r-10 Deny
+                                                                      .media-body.text-right.icon-state
+                                                                        label.switch
+                                                                          input.checkbox(type='checkbox',  name="deny")
+                                                                          span.switch-state
+                                                                     
                                   #pills-add-group.tab-pane.fade(role='tabpanel', aria-labelledby='pills-add-group-tab')
                                     p.mb-0.m-t-30
                                         .select2-drpdwn
@@ -178,6 +201,10 @@ html(lang='en')
                 $('body').append(form);
                 form.submit();
             }
+            //only one check selected
+            $('input.checkbox').on('change', function() {
+                $('input.checkbox').not(this).prop('checked', false);  
+            });
         each g in command_sets
             script(type='text/javascript').
                 $('#table#{g.name}').DataTable({
