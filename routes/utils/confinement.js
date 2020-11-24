@@ -56,7 +56,7 @@ router.post('/command-set-add-command', function (req, res, next) {
         command = req.body.command_path
 
         if (!allow && !deny){
-            res.redirect('/confinement/shells/management?command-sets=true');
+            res.redirect('/confinement/shells/command-sets?error=true');
         }
         else{
             mdb.connect(mongo_instance)
