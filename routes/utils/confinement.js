@@ -55,6 +55,11 @@ router.post('/command-set-add-command', function (req, res, next) {
         deny = req.body.deny
         command = req.body.command_path
 
+        var access_mode = req.body.access_mode;
+        if(!(access_mode instanceof Array)){
+            access_mode = access_mode.split();
+        }
+
         if (!allow && !deny){
             res.redirect('/confinement/shells/command-sets?error=true');
         }
@@ -65,7 +70,7 @@ router.post('/command-set-add-command', function (req, res, next) {
                         if(deny=="on"){
                             command="deny "+command
                         }
-                        mdb.updDocument("command_sets", { name: req.body.command_set} , { $push : { commands: { path: command, access_mode: req.body.access_mode }}})
+                        mdb.updDocument("command_sets", { name: req.body.command_set} , { $push : { commands: { path: command, access_mode: access_mode.join("") }}})
                             .then(
                                 function () {
                                     res.redirect('/confinement/shells/command-sets?error=false');
@@ -84,6 +89,7 @@ router.post('/command-set-delete-command', function (req, res, next) {
         mdb.connect(mongo_instance)
             .then(
                 function () {
+                    console.log(req.body.command_path)
                     mdb.updDocument("command_sets", { name: req.body.command_set} , { $pull : { commands: { path: req.body.command_path, access_mode: req.body.access_mode }}})
                         .then(
                             function () {
@@ -179,7 +185,7 @@ router.post('/shell-delete', function (req, res, next) {
         .then(
             function () {
                 shell = req.body.shell;
-                mdb.findManyDocuments("users", {loginShell: "/opt/maics/"+shell})
+                mdb.findManyDocuments("users", {loginShell: "/opt/maics_jails/"+shell})
                 .then(
                     function(users){
                         p1 = users.map(function(member){

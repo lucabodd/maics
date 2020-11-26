@@ -16,6 +16,9 @@ setTimeout(function(){
             $(".js-addshell").select2({
                 placeholder: "Select users..."
             });
+            $(".js-accessmode").select2({
+                placeholder: "Select Access Mode..."
+            });
             //Limited Numbers
             $(".js-example-basic-multiple-limit").select2({
                 maximumSelectionLength: 2

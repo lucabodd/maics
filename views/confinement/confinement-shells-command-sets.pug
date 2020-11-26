@@ -72,8 +72,7 @@ html(lang='en')
                                                                     input.form-control(type='text', placeholder='Command Path...' name='command_path' required)
                                                             .mb-2
                                                                 .col-form-label Access Mode:
-                                                                select.js-example-basic-single.col-sm-12(name='access_mode' style="width: 100%" required)
-                                                                    option(disabled selected) Select Access Mode...
+                                                                select.js-accessmode.col-sm-12(name='access_mode' multiple='multiple' style="width: 100%" required)
                                                                     option(value="r") Read
                                                                     option(value="w") Write
                                                                     option(value="a") Append
@@ -195,8 +194,8 @@ html(lang='en')
             function delete_command(path, access_mode, command_set)
             {
                 var form = $('<form action="/utils/command-set-delete-command" method="post">' +
-                              '<input type="hidden" name="command_path" value='+path+'>'+
-                              '<input type="hidden" name="command_set" value='+command_set+'>'+
+                              '<input type="hidden" name="command_path" value="'+path+'">'+
+                              '<input type="hidden" name="command_set" value="'+command_set+'">'+
                               '<input type="hidden" name="access_mode" value='+access_mode+'></form>');
                 $('body').append(form);
                 form.submit();

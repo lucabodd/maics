@@ -1,0 +1,18 @@
+
+#include <tunables/global>
+
+/opt/maics_jails/{{shell_name}} {
+  #include <abstractions/base>
+  #include <abstractions/bash>
+
+  capability sys_resource,
+  capability audit_write,
+
+  ptrace (readby),
+  ptrace peer=@{profile_name},
+  ptrace peer=unconfined,
+
+  /opt/maics_jails/{{shell_name}} ix,
+
+  {{command_sets}}
+}
