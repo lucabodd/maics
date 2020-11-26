@@ -90,6 +90,12 @@
         regexp: '^shadow:'
         line: 'shadow:          compat ldap'
 
+    - name: "ldap: configuring nscd.conf"
+      template:
+        src: ../templates/ldap-client/nscd.conf
+        dest: /etc/nscd.conf
+        mode: 0644
+
     - name: stop nscd
       service:
         name: nscd
