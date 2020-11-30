@@ -156,7 +156,7 @@ router.post('/deploy-ssh-key', function (req, res, next) {
                         mdb.updDocument("hosts", {hostname: hostname}, {$set: {connection: "login-check", connection_detail: "Logging in, please refresh page in a while ..." }})
                         .then(
                             function(){
-                                log('[+] User '+req.session.email+' requested client deploy for host'+host, app_log);
+                                log('[+] User '+req.session.email+' requested client deploy for host'+hostname, app_log);
                                 res.redirect('/hosts/management?error=false');
                             },
                             function(err){

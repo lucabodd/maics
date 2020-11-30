@@ -6,6 +6,7 @@
 
 ---
 - hosts: all
+  gather_facts: no
   tasks:
     - name: Update repositories cache and install libnss-ldap libpam-ldap ldap-utils packages
       apt:

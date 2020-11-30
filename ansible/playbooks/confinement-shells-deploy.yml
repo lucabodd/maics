@@ -32,13 +32,3 @@
 
   - name: reload profile
     shell: "apparmor_parser -r /etc/apparmor.d/opt.maics_jails.{{shell_name}}"
-
-  - name: stop nscd
-    service:
-      name: nscd
-      state: stopped
-
-  - name: start nscd
-    service:
-      name: nscd
-      state: started

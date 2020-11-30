@@ -137,11 +137,11 @@ html(lang='en')
                                                                                     i.fa.fa-ban
                                                                         if h.connection == 'proxy-refuse' 
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Host is not reachable via SSH port '+h.port)
+                                                                                button.example-popover.btn.btn-danger(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Host is not reachable via SSH port '+h.port+' proxy refuses to connect')
                                                                                     i.fa.fa-chain-broken
                                                                         else if h.connection == 'unknown'
                                                                             td(style="width:  2%").mx-auto
-                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Unknown error occurred')
+                                                                                button.example-popover.btn.btn-warning(type='button', title='', data-container='body', data-toggle='popover', data-html="true", data-placement='left', data-content=h.connection_detail, data-original-title='Unknown error occurred' onclick="deploy_confirm('"+h.hostname+"');")
                                                                                     i.fa.fa-question
                                                                         else if h.connection == 'maics-ward-undeployed'
                                                                             td(style="width:  2%").mx-auto           
@@ -194,7 +194,7 @@ html(lang='en')
             {
                 Swal.fire({
                       title: 'Are you sure?',
-                      text: "Once you deployed the client host will be under control of SKDC. only user defined in access management will be able to log in into this machine!",
+                      text: "Once you deployed the client host will be under control of MAICS. only user defined in access management will be able to log in into this machine!",
                       icon: 'warning',
                       showCancelButton: true,
                       confirmButtonColor: '#3085d6',

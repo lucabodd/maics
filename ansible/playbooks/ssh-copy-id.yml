@@ -6,6 +6,7 @@
 
 ---
 - hosts: all
+  gather_facts: no
   become: "{{ 'yes' if sudo is defined or su is defined else 'no' }}"
   become_method: "{{ 'sudo' if sudo is defined else 'su' }}"
 
