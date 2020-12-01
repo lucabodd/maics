@@ -1,0 +1,35 @@
+###############################################################################
+#
+# Deploy client
+#
+###############################################################################
+
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+
+  - name: Update repositories cache and install golang and git packages
+    apt:
+        name:
+        - git
+        - golang
+        update_cache: yes
+
+  - name: "copying source file..."
+    template:
+      src: ../templates/maics-rku-deploy/maics-rku.go
+      dest: /tmp/maics-rku.go
+
+  - name: "copying pkg libs..."
+    copy:
+        src: ../templates/maics-rku-deploy/pkg
+        dest: /tmp/
+
+  - name: "building sources"
+    shell: go build -o /usr/bin/maics-rku /tmp/maics-rku.go
+
+  - name: "removing golang sources"
+    file:
+      path: /tmp/maics-rku.go
+      state: absent
