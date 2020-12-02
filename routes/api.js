@@ -16,6 +16,10 @@ var mongo_instance = config.mongo.instance
 const log = require('log-to-file');
 const app_log = config.maics.log_dir+"app.log"
 
+//RSA
+var AES_256_CFB = require("../modules/aes-256-cfb");
+var aes_256_cfb = new AES_256_CFB();
+
 //example query
 //curl 'http://10.60.0.24:3000/api/host-add?hostname=hqit-demetra-01&ip=10.60.0.47&port=22&cluster=HQIT&proxy=none'
 
@@ -48,6 +52,13 @@ router.get('/host-add', function (req, res, next) {
                 log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
                 res.sendStatus(500);
             });
+});
+
+router.post('/challenge', function (req, res, next) {
+    console.log(req.body.host_id+" TS:"+req.body.ts)
+    dec_ts = aes_256_cfb.AESdecrypt("asdertoiunbuidse", req.body.ts)
+    console.log(dec_ts)
+    console.log(req.body.user)
 });
 
 /***************************************

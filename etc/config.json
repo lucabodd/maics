@@ -9,7 +9,7 @@
         "run_dir" : "/var/run/maics/",
         "ssh_key_lifetime": 32400,
         "SSL": {
-            "CERT": "/var/www/maics/ssl/https/certificate.pem",
+            "CERT": "/var/www/maics/ssl/https/cert.pem",
             "KEY": "/var/www/maics/ssl/https/key.pem"
         }
     },

@@ -1,3 +1,6 @@
+var UTILS = require("./modules/utils");
+var utils = new UTILS();
+
 var sshpk = require('sshpk');
 
 var fs = require('fs');
@@ -29,3 +32,6 @@ v.update(data);
 var valid = v.verify(tmp);
 console.log(valid)
 /* => true! */
+
+
+console.log(utils.hashsum(["maics01","maics02"]))

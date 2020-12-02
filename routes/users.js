@@ -56,6 +56,44 @@ router.get('/management', function (req, res, next) {
                 });
 });
 
+router.get('/robots', function (req, res, next) {
+        var err = ''
+        err += req.query.error;
+        mdb.connect(mongo_instance)
+            .then(
+                function () {
+                    var users = mdb.findManyDocuments("robots", {});
+                    var userCount = mdb.countCollectionItems("robots");
+                    var hosts = mdb.findManyDocuments("hosts", {connection: "true"}, {hostname:1});
+                    Promise.all([users, userCount, hosts])
+                        .then(
+                            function (value) {
+                                host_names = value[2].map(function(el){
+                                    return el.hostname;
+                                })
+                                res.render('users-robots', {
+                                    users: value[0],
+                                    user_count: value[1],
+                                    hosts: value[2],
+                                    host_names:host_names,
+                                    username: req.session.email,
+                                    role: req.session.role,
+                                    code: req.query.code,
+                                    error: err
+                                });
+                            },
+                            function (err) {
+                                log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                            }
+                        );
+                },
+                function(err){
+                    log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+                    res.render('error-500',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                });
+});
+
 router.get('/groups', function (req, res, next) {
         var err = ''
         err += req.query.error;

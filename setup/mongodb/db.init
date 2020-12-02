@@ -14,3 +14,4 @@ db.access_users.createIndex( { "hostname": 1, "email":1 }, { unique: true } );
 db.access_groups.createIndex( { "hostname": 1, "group":1 }, { unique: true } );
 db.hostgroups.createIndex( { "name": 1}, { unique: true } );
 db.command_sets.createIndex({ "name": 1}, { unique: true });
+db.robots.createIndex({ "sys_username": 1}, { unique: true });

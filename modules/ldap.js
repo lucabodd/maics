@@ -396,7 +396,7 @@ LDAP.prototype.getUserGroups = function (uid)
 }
 
 
-LDAP.prototype.addUser = function (uid, domain, password)
+LDAP.prototype.addUser = function (uid, domain, password, sshPublicKey)
 {
     var _this = this
     return new Promise(function(resolve, reject){
@@ -441,8 +441,6 @@ LDAP.prototype.addUser = function (uid, domain, password)
                         _this.genLdapHashes(password)
                         .then(
                             function(hashes){
-                                var fullname = uid.split(".");
-                                var alias_uid = fullname[0].charAt(0) + fullname[1];
                                 var user = {
                                     objectClass: ["top",
                                     "person",
@@ -453,14 +451,14 @@ LDAP.prototype.addUser = function (uid, domain, password)
                                     "ldapPublicKey"],
                                     loginShell: "/bin/bash",
                                     homeDirectory: "/home/"+uid,
-                                    uid: [uid, alias_uid],
+                                    uid: uid,
                                     cn: uid,
                                     sn: uid,
                                     uidNumber: max_uid,
                                     gidNumber: max_gid,
                                     mail: uid+"@"+domain,
                                     userPassword: hashes.ldap,
-                                    sshPublicKey: ""
+                                    sshPublicKey: sshPublicKey
                                 };
                                 var group = {
                                     memberUid: uid,
@@ -495,8 +493,6 @@ LDAP.prototype.addUser = function (uid, domain, password)
                                 log("[-] Cannot generate hashes, reason: "+err,ldap_log);
                             }
                         );
-                        //user alias
-                        var alias_uid = "";
                     },
                     function(err){
                         log("[-] Cannot search in ldap, reason: "+err,ldap_log);

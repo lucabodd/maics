@@ -13,6 +13,9 @@ setTimeout(function(){
             $(".js-adduser-multiple").select2({
                 placeholder: "Select groups..."
             });
+            $(".js-adduserobot-multiple").select2({
+                placeholder: "Select Connected Host..."
+            });
             $(".js-addshell").select2({
                 placeholder: "Select users..."
             });

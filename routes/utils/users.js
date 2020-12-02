@@ -66,7 +66,7 @@ router.post('/user-add', function (req, res, next) {
             const password = randomstring.generate(8);
             //adding user to DBs
             var p1 = mdb.addDocument("users", document);
-            var p2 = ldap.addUser(req.body.uid, req.body.domain, password);
+            var p2 = ldap.addUser(req.body.uid, req.body.domain, password,"");
 
             Promise.all([p1,p2])
             .then(
@@ -294,5 +294,8 @@ router.get('/user-unlock', function (req, res, next) {
             }
         );
 });
+
+
+
 
 module.exports = router;
