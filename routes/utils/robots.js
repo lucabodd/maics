@@ -297,10 +297,8 @@ router.post('/robot-allowed-host-delete', function (req, res, next) {
                                 function(value){
                                     hashsum = utils.hashsum(value.assigned_hosts)
                                     sshPublicKey = aes_256_cfb.AESdecrypt(hashsum, value.sshPublicKey);
-                                    console.log(sshPublicKey)
                                     index = value.assigned_hosts.indexOf(host);
                                     value.assigned_hosts.splice(index, 1);
-                                    console.log(value.assigned_hosts)
                                     hashsum = utils.hashsum(value.assigned_hosts)
                                     sshPublicKey = aes_256_cfb.AESencrypt(hashsum, sshPublicKey);
 

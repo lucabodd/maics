@@ -86,7 +86,7 @@ html(lang='en')
                                              select.js-adduserobot-multiple(name="hosts" style="width: 100%;" multiple='multiple')
                                                  if hosts
                                                      each val in hosts
-                                                         option(value=val)=val
+                                                         option(value=val.hostname)=val.hostname
                                          .f1-buttons
                                              button.btn.btn-primary.btn-previous(type='button') Previous
                                              | &nbsp;

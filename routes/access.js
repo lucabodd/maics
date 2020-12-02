@@ -123,6 +123,45 @@ router.get('/groups', function(req, res, next) {
                 });
 });
 
+router.get('/robots', function(req, res, next) {
+        var err = ''
+        err += req.query.error;
+
+        mdb.connect(mongo_instance)
+            .then(
+                function () {
+                    var hosts = mdb.findManyDocuments("hosts", {connection: "true"},{hostname:1});
+                    var hostgroups = mdb.findManyDocuments("hostgroups", {});
+                    var robots = mdb.findManyDocuments("robots", {});
+                    var access = mdb.findManyDocuments("access_robots", {});
+                    Promise.all([hosts, hostgroups, robots, access])
+                        .then(
+                            function (value) {
+                                res.render('access-robots', {
+                                    hosts: value[0],
+                                    hostgroups: value[1],
+                                    robots: value[2],
+                                    access_robots: value[3],
+                                    error: err,
+                                    code: req.query.code,
+                                    username: req.session.email,
+                                    role: req.session.role
+                                });
+                            },
+                            function (err) {
+                                log('[-] Connection to MongoDB has been established, but no query can be performed, reason: '+err.message, app_log);
+                                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                            }
+                        );
+                },
+                function(err){
+                    log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
+                    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
+                });
+});
+
+
+
 router.get('/compliance', function(req, res, next) {
         var err = ''
         err += req.query.error;
