@@ -130,7 +130,7 @@ router.get('/robots', function(req, res, next) {
         mdb.connect(mongo_instance)
             .then(
                 function () {
-                    var hosts = mdb.findManyDocuments("hosts", {connection: "true"},{hostname:1});
+                    var hosts = mdb.findManyDocuments("hosts", {ecdsaPublicKey: {$ne: ""}});
                     var hostgroups = mdb.findManyDocuments("hostgroups", {});
                     var robots = mdb.findManyDocuments("robots", {});
                     var access = mdb.findManyDocuments("access_robots", {});

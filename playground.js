@@ -1,6 +1,10 @@
 var UTILS = require("./modules/utils");
 var utils = new UTILS();
 
+//Time format
+var ZT = require("./modules/ztime");
+var ztime = new ZT();
+
 var sshpk = require('sshpk');
 
 var fs = require('fs');
@@ -32,6 +36,5 @@ v.update(data);
 var valid = v.verify(tmp);
 console.log(valid)
 /* => true! */
-
-
-console.log(utils.hashsum(["maics01","maics02"]))
+console.log(ztime.current())
+console.log(ztime.minutesDiff("20201202221750Z"))

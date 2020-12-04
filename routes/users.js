@@ -64,7 +64,7 @@ router.get('/robots', function (req, res, next) {
                 function () {
                     var users = mdb.findManyDocuments("robots", {});
                     var userCount = mdb.countCollectionItems("robots");
-                    var hosts = mdb.findManyDocuments("hosts", {connection: "true"}, {hostname:1});
+                    var hosts = mdb.findManyDocuments("hosts", {ecdsaPublicKey: {$ne: ""}}, {hostname:1});
                     Promise.all([users, userCount, hosts])
                         .then(
                             function (value) {

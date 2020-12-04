@@ -34,7 +34,8 @@ router.post('/host-add', function (req, res, next) {
         hostgroups: req_hostgroups.join(" "),
         proxy: req.body.proxy,
         connection: "unreachable",
-        connection_detail: "Pending connection ..." //detail of connection error - string is base64 encoded
+        connection_detail: "Pending connection ...", //detail of connection error - string is base64 encoded
+        ecdsaPublicKey: ""
     };
 
     mdb.connect(mongo_instance)

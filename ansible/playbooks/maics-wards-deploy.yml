@@ -8,13 +8,14 @@
 - hosts: all
   gather_facts: no
   tasks:
+
   - name: Update repositories cache and install golang and git packages
     apt:
         name:
         - git
         update_cache: yes
 
-  - name: unarchive go to /usr/local/go
+  - name: unarchive go to /usr/local/
     unarchive:
       src: https://dl.google.com/go/go1.15.5.linux-amd64.tar.gz
       dest: /usr/local/
@@ -29,6 +30,32 @@
   - name: installing required golang libs
     command: /usr/local/go/bin/go get github.com/tidwall/gjson
 
+  - name: "Installing required packcages"
+    shell: /usr/local/go/bin/go get github.com/lucabodd/go-ldap-client
+
+  - name: "Installing required packcages"
+    shell: /usr/local/go/bin/go get github.com/lucabodd/go-ldap-client
+
+  # Installing maics-wards
+  - name: retriveing root public key for maics
+    shell: "cat /home/{{maics_user}}/.ssh/id_rsa.pub"
+    delegate_to: localhost
+    register: id_rsa_pub
+
+  - name: "copying source file..."
+    template:
+      src: ../templates/maics-ward-deploy/maics-ward.go
+      dest: /tmp/maics-ward.go
+
+  - name: "building sources"
+    shell: /usr/local/go/bin/go build -o /usr/sbin/maics-ward /tmp/maics-ward.go
+
+  - name: "removing golang sources"
+    file:
+      path: /tmp/maics-ward.go
+      state: absent
+
+  # Installing maics-rku
   - name: templating ecdsa private key
     shell: cat /etc/ssh/ssh_host_ecdsa_key
     register: ecdsa_private_key

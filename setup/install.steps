@@ -38,39 +38,9 @@ host_key_checking = False
 
 8 - /var/run/SKDC /var/log/SKDC dir and grant permission to user
 
-9 - create skdc webapp service file
-[Unit]
-Description=SKDC frontend service
-After=network.target
-
-[Service]
-Type=simple
-User=20025
-Group=20025
-Restart=always
-RestartSec=1
-ExecStart=/usr/bin/node /var/www/SKDC/app.js
-
-[Install]
-WantedBy=multi-user.target
-
-10 - create skdc controller daemon service file according to skdc dir
-[Unit]
-Description=SKDC daemon service
-
-[Service]
-Type=forking
-RuntimeDirectory=SKDC/
-User=20025
-Group=20025
-PIDFile=/var/run/SKDC/skdcd.pid
-ExecStart=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json
-ExecStop=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s quit
-ExecReload=/var/www/SKDC/daemons/skdcd -c /var/www/SKDC/etc/config.json -s reload
-SendSIGHUP=yes
-
-[Install]
-WantedBy=multi-user.target
 
 10 - configure mongodb admin user
 https://docs.mongodb.com/manual/tutorial/enable-authentication/
+
+11- install ansible galaxy role
+ansible-galaxy install fubarhouse.golang

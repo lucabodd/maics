@@ -11,3 +11,6 @@
     fail:
       msg: "maics-ward-undeployed : maics client not deployed, click to deploy"
     when: not deployed.stat.exists
+
+  - name: registering ecdsa key
+    shell: cat /etc/ssh/ssh_host_ecdsa_key.pub
