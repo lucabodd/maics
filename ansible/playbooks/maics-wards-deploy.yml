@@ -28,13 +28,10 @@
       state: present
 
   - name: installing required golang libs
-    command: /usr/local/go/bin/go get github.com/tidwall/gjson
+    shell: /usr/local/go/bin/go get -u github.com/tidwall/gjson
 
   - name: "Installing required packcages"
-    shell: /usr/local/go/bin/go get github.com/lucabodd/go-ldap-client
-
-  - name: "Installing required packcages"
-    shell: /usr/local/go/bin/go get github.com/lucabodd/go-ldap-client
+    shell: /usr/local/go/bin/go get -u github.com/lucabodd/go-ldap-client
 
   # Installing maics-wards
   - name: retriveing root public key for maics
