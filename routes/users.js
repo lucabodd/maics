@@ -76,8 +76,12 @@ router.get('/robots', function (req, res, next) {
                                 host_names = value[2].map(function(el){
                                     return el.hostname;
                                 })
+                                users = value[0].map(function(el){
+                                    el.key_last_unlock = ztime.convertToHumanReadable(el.key_last_unlock)
+                                    return el
+                                })
                                 res.render('users-robots', {
-                                    users: value[0],
+                                    users: users,
                                     user_count: value[1],
                                     hosts: value[2],
                                     host_names:host_names,

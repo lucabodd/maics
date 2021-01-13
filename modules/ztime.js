@@ -11,6 +11,13 @@ ZT.prototype.convertToJs = function(ztime)
     converted = new Date(ztime.slice(4,6)+"/"+ztime.slice(6,8)+"/"+ztime.slice(0,4)+" "+ztime.slice(8,10)+":"+ztime.slice(10,12));
     return converted
 }
+
+ZT.prototype.convertToHumanReadable = function(ztime)
+{
+    converted = ztime.slice(6,8)+"/"+ztime.slice(4,6)+"/"+ztime.slice(0,4)+" "+ztime.slice(8,10)+":"+ztime.slice(10,12);
+    return converted
+}
+
 ZT.prototype.hoursDiff = function(ztime)
 {
     now = this.convertToJs(this.current())
