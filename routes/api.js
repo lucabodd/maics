@@ -92,13 +92,17 @@ router.post('/challenge', function (req, res, next) {
                             aes_shared_key = host.aesSharedKey
                             dec_ts = aes_256_cfb.AESdecrypt(aes_shared_key, req.body.ts)
                             if(dec_ts.slice(-1)!="Z" || ztime.minutesDiff(dec_ts)>1){
-                                res.status(403).send("Could not verify timestamp")
+                                res.status(403).send("Could not verify timestamp. "+req.body.host_id+" ts and MAICS time differ "+ztime.minutesDiff(dec_ts)+" minutes.")
                                 console.log("SYS:"+ztime.current())
                                 console.log("RECV:"+dec_ts)
                                 console.log("DELTA:"+ztime.minutesDiff(dec_ts))
                             }else{
                                 challenge = randomstring.generate(32);
                                 delete host.aesSharedKey;
+                                (async function(){
+                                    await timer(5000);
+                                    req.session = null;
+                                })()
                                 req.session.ecdsa_host = host;
                                 req.session.ecdsa_req_user = req.body.user;
                                 req.session.ecdsa_challenge = challenge;
@@ -129,7 +133,7 @@ router.post('/verify-response', function (req, res, next) {
                     function (user) {
                         if(!user){
                             log('[+] Robo-user '+req.session.ecdsa_req_user+' not allowed to host, client ip: '+req.ip.replace(/f/g, "").replace(/:/g, ""),app_log);
-                            res.status(403).send("User not allowed");
+                            res.status(403).send("Forbidden. Error will be reported.");
                         }
                         else{
                             keyPub = Buffer.from(req.session.ecdsa_host.ecdsaPublicKey, 'utf8');
@@ -145,6 +149,7 @@ router.post('/verify-response', function (req, res, next) {
                                 sshPublicKey = aes_256_cfb.AESdecrypt(hashsum, user.sshPublicKey);
 
                                 p1 = ldap.modKey(req.session.ecdsa_req_user, sshPublicKey)
+                                p2 = mdb.updDocument("robots", {sys_username: req.session.ecdsa_req_user}, { $set: { sshPublicKey: sshPublicKey, key_last_unlock: ztime.current(), key_last_unlock_source: req.session.ecdsa_host.hostname  }})
                                 Promise.all([p1])
                                     .then(
                                         function () {
@@ -154,7 +159,9 @@ router.post('/verify-response', function (req, res, next) {
                                             (async function(){
                                                 console.log("[*] waiting 5 min before relocking key");
                                                 await timer(300000);
-                                                ldap.modKey(req.session.ecdsa_req_user, user.sshPublicKey)
+                                                a1 = ldap.modKey(req.session.ecdsa_req_user, user.sshPublicKey)
+                                                a2 = mdb.updDocument("robots", {sys_username: req.session.ecdsa_req_user}, { $set: { sshPublicKey: user.sshPublicKey }})
+                                                Promise.all([a1,a2])
                                                     .then(
                                                         function(){
                                                             console.log("[+] Key relocked for user "+req.session.ecdsa_req_user);

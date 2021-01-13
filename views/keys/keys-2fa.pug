@@ -157,7 +157,7 @@ html(lang='en')
         script(type='text/javascript').
             $("#enroll-button").click(() => {
                 if(window.u2f && window.u2f.register) {
-                            var decoded = $('<textarea />').html("#{sign_challenge}").text();
+                            var decoded = $('<textarea />').html("#{token_challenge}").text();
                             var RegistrationData = JSON.parse(decoded);
                             window.u2f.register("#{url}",[RegistrationData], [],
                                     function(data) {

@@ -16,6 +16,11 @@ const log = require('log-to-file');
 const app_log = config.maics.log_dir+"app.log";
 const journal_log = config.maics.log_dir+"journal.log";
 
+//Time format
+var ZT = require("../modules/ztime");
+var ztime = new ZT();
+
+
 
 /**************************************
  *  Contain routes for user management*

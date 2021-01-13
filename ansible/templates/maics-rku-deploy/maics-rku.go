@@ -50,13 +50,13 @@ func main() {
     Check(err)
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
-    cookies := resp.Cookies()[0]
-    Check(err)
-
     if(resp.StatusCode !=200){
         fmt.Println("[-] ERROR: got "+strconv.Itoa(resp.StatusCode)+" "+string(body)+", Killing.")
         Kill(1)
     }
+    cookies := resp.Cookies()[0]
+    Check(err)
+
     fmt.Println("[+] Challenge received, authenticating challenge")
 
     challenge := gjson.Get(string(body), "challenge").String()

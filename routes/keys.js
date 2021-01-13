@@ -91,6 +91,8 @@ router.get('/2fa', function(req, res, next) {
                             else
                                 challenge = "true";
 
+                            console.log(challenge);
+                            
                             res.render('keys-2fa', {
                                 sys_username: value.sys_username,
                                 username: req.session.email,

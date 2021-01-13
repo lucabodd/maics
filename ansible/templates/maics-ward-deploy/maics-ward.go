@@ -29,11 +29,19 @@ func main() {
     	// It is the responsibility of the caller to close the connection
     	defer client.Close()
 
-
-    	publickey, err := client.GetUserAttribute(req_user, "sshPublicKey")
-    	if err != nil {
-    		fmt.Printf("Error getting groups for user %s: %+v", "username", err)
-    	}
-    	fmt.Printf(publickey)
+        locked, err := client.GetUserAttribute(req_user, "pwdAccountLockedTime")
+        if err != nil {
+    		fmt.Printf("Error getting pwdAccountLockedTime for user %s: %+v", req_user, err)
+    	} else {
+            if locked == "" {
+                publickey, err := client.GetUserAttribute(req_user, "sshPublicKey")
+            	if err != nil {
+            		fmt.Printf("Error getting sshPublicKey for user %s: %+v", req_user, err)
+            	}
+            	fmt.Printf(publickey)
+            } else {
+                fmt.Println("Permission denied. (Account Locked)")
+            }
+        }
     }
 }

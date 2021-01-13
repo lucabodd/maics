@@ -66,7 +66,8 @@ router.post('/robot-user-add', function (req, res, next) {
         pwdChangedTime: ztime.current(),
         pwdAccountLockedTime: null,
         key_last_unlock: "19700101000010Z",
-        assigned_hosts: req_hosts
+        assigned_hosts: req_hosts,
+        key_last_unlock_source: "none",
     };
 
     mdb.connect(mongo_instance)
