@@ -32,7 +32,7 @@ const APP_ID = config.maics.url;
 
 router.get('/password-change', function(req, res, next) {
         res.render('password-change', {
-            username: req.session.email,
+            sys_username: req.session.sys_username,
             role: req.session.role,
             error: req.query.error
         });

@@ -72,6 +72,7 @@ router.post('/auth', function(req, res, next){
                             else {
                                 //init session vars
                                 req.session.email = user.email;
+                                req.session.sys_username = user.sys_username;
                                 req.session.role = user.role;
                                 req.session.key_lock = true;
                                 req.session.cookie.expires = new Date(Date.now() + (15 * 60 * 1000));

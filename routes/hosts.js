@@ -51,7 +51,7 @@ router.get('/management', function (req, res, next) {
                                 res.render('hosts-management', {
                                     hosts: value[0],
                                     host_count: value[1],
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role,
                                     hostgroups: value[2],
                                     code: req.query.code,
@@ -90,7 +90,7 @@ router.get('/hostgroups', function (req, res, next) {
                                 res.render('hosts-hostgroups', {
                                     hosts: value[0],
                                     cluster_count: value[1],
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role,
                                     hostgroups: value[2],
                                     error: err,

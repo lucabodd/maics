@@ -62,12 +62,13 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: '21600'}));
 //middleware authorization for routes
 //require authentication for all except /api/
 
-//app.get(/^\/(?!api).*/, function(req,res,next){
-//        if (!req.session.email)
-//            res.render('login');
-//        else
-//            next();
-//});
+app.get(/^\/(?!api).*/, function(req,res,next){
+        if (!req.session.email)
+            res.render('login');
+        else
+            next();
+});
+
 app.get('/home/tech/*', function(req,res,next){
     if (req.session.role == "user") {
         log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)

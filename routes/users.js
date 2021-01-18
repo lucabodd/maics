@@ -42,7 +42,7 @@ router.get('/management', function (req, res, next) {
                                 res.render('users-management', {
                                     users: value[0],
                                     user_count: value[1],
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role,
                                     groups: value[2],
                                     code: req.query.code,
@@ -85,7 +85,7 @@ router.get('/robots', function (req, res, next) {
                                     user_count: value[1],
                                     hosts: value[2],
                                     host_names:host_names,
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role,
                                     code: req.query.code,
                                     error: err
@@ -126,7 +126,7 @@ router.get('/groups', function (req, res, next) {
                                 res.render('users-groups', {
                                     users: value[0],
                                     group_count: value[1],
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role,
                                     groups: value[2],
                                     code: req.query.code,
@@ -161,7 +161,7 @@ router.get('/groups', function (req, res, next) {
                                  res.render('users-roles', {
                                      users: value[0],
                                      user_count: value[1],
-                                     username: req.session.email,
+                                     sys_username: req.session.sys_username,
                                      role: req.session.role,
                                      groups: value[2],
                                      code: req.query.code,

@@ -31,6 +31,8 @@ router.get('/shells/management', function (req, res, next) {
                     })
 
                     res.render('confinement-shells-management', {
+                        role: req.session.role,
+                        sys_username: req.session.sys_username,
                         command_sets: value[0],
                         confinement_shells: value[1],
                         command_sets_names: command_sets_names,
@@ -54,6 +56,8 @@ router.get('/shells/command-sets', function (req, res, next) {
             .then(
                 function (value) {
                     res.render('confinement-shells-command-sets',{
+                        role: req.session.role,
+                        sys_username: req.session.sys_username,
                         command_sets: value[0],
                         error: req.query.error
                     })
@@ -76,6 +80,8 @@ router.get('/shells/assign', function (req, res, next) {
             .then(
                 function (value) {
                     res.render('confinement-shells-assign',{
+                        role: req.session.role,
+                        sys_username: req.session.sys_username,
                         users: value[0],
                         confinement_shells: value[1],
                         groups: value[2],

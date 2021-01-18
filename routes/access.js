@@ -60,7 +60,7 @@ router.get('/users', function(req, res, next) {
                                     access: value[4],
                                     error: err,
                                     code: req.query.code,
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role
                                 });
                             },
@@ -107,7 +107,7 @@ router.get('/groups', function(req, res, next) {
                                     access: value[4],
                                     error: err,
                                     code: req.query.code,
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role
                                 });
                             },
@@ -144,7 +144,7 @@ router.get('/robots', function(req, res, next) {
                                     access_robots: value[3],
                                     error: err,
                                     code: req.query.code,
-                                    username: req.session.email,
+                                    sys_username: req.session.sys_username,
                                     role: req.session.role
                                 });
                             },
@@ -167,6 +167,8 @@ router.get('/compliance', function(req, res, next) {
         err += req.query.error;
 
         res.render('access-compliance', {
+            sys_username: req.session.sys_username,
+            role: req.session.role,
             error: err
         });
 
