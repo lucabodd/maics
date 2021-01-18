@@ -100,7 +100,7 @@ router.post("/password-reset", function (req,res,next) {
                                     )
 
                                      //send mail to admin
-                                     text="User "+uid+" asked for a password reset. If you think this is a suspicious activity, please log in and lock account as soon as possible.\nRequest occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User agent: "+req.get('User-Agent');
+                                     text="User "+uid+" asked for a password reset.<br>If you think this is a suspicious activity, please log in and lock account as soon as possible.<br><br>Request occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+"<br>User agent: "+req.get('User-Agent');
                                      admin_mail = "MAICS <"+config.maics.admin_mail+">"
                                      admins_mail = "Admins <"+config.maics.admin_mail+">"
                                      var message = {
@@ -118,13 +118,13 @@ router.post("/password-reset", function (req,res,next) {
                                         }
                                       });
                                      //send mail to user
-                                     text="Password for user "+uid+" has been reset successfully. Your temporary password is: "+pwd+" please change it by clicking on the button below and follow the procedure.\n ";
+                                     text="Password for user "+uid+" has been resetted successfully.<br>Your temporary password is: "+pwd+" please change it by clicking on the button below and follow the procedure.<br>";
                                      admin_mail = "MAICS <"+config.maics.admin_mail+">"
                                      user_mail = uid+" <"+user.email+">"
                                      var message = {
                                         from: admin_mail,
                                         to: user_mail,
-                                        subject: "MAICS - User password "+uid+" reset",
+                                        subject: "MAICS - User password "+uid+" resetted",
                                         html: util.format(mail.noreset , text)
                                      };
 
@@ -154,7 +154,7 @@ router.post("/password-reset", function (req,res,next) {
                         }//end of if for pwdAccountLockedTime
                         else {
                             //send mail to admin
-                            text="User "+uid+" asked for a password reset. Unfortunately MAICS cannot change password for this user because is locked due to password expiration or policy.\nIf you think this request is legitimate please login to MAICS and unlock user account.\nRequest occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User agent: "+req.get('User-Agent');
+                            text="User "+uid+" asked for a password reset.<br>Unfortunately MAICS cannot change password for this user because is locked due to password expiration or lockout policy.<br>If you think this request is legitimate please login to MAICS and unlock user account.<br><br>Request occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+"<br>User agent: "+req.get('User-Agent');
                             admin_mail = "MAICS <"+config.maics.admin_mail+">"
                             admins_mail = "Admins <"+config.maics.admin_mail+">"
                             var message = {
@@ -172,7 +172,7 @@ router.post("/password-reset", function (req,res,next) {
                                }
                              });
                              //send mail to user
-                             text="Password reset for "+uid+" has been requested. Unfortunately MAICS cannot change password for this user because it is locked.\nPlease ask administrators to unlock your account";
+                             text="Password reset for "+uid+" has been requested.<br>Unfortunately MAICS cannot change password for this user because it is locked.<br>Please reach administrators at "+config.maics.admin_mail+" asking to unlock your account";
                              admin_mail = "MAICS <"+config.maics.admin_mail+">"
                              admins_mail = "Admins <"+config.maics.admin_mail+">"
                              var message = {
@@ -195,7 +195,7 @@ router.post("/password-reset", function (req,res,next) {
                     else{
                         log('[*] Unknown user '+uid+' asked for password reset, maybe someone is trying to do something nasty.', app_log);
                          //send mail to admin
-                         text="User "+uid+" asked for a password reset, this user cannot be found in system maybe someone is trying to do something nasty.\nRequest occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User agent: "+req.get('User-Agent');
+                         text="User "+uid+" asked for a password reset, this user cannot be found in system maybe someone is trying to do something nasty.<br><br>Request occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+"<br>User agent: "+req.get('User-Agent');
                          admin_mail = "MAICS <"+config.maics.admin_mail+">"
                          admins_mail = "Admins <"+config.maics.admin_mail+">"
                          var message = {

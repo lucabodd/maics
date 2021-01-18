@@ -94,7 +94,7 @@ router.post('/user-add', function (req, res, next) {
                     Promise.all(pAll)
                     .then(
                         function(){
-                            log("[+] User "+req.body.uid+" on internal system by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                            log("[+] User "+req.body.uid+" added on MAICS system by: "+req.session.email+".<br><br>Request occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+"<br>User Agent: "+req.get('User-Agent'), journal_log);
                             log("[+] User "+req.body.uid+" insered successfully on LDAP and MongoDB by: "+req.session.email, app_log);
                             //sending Mail
                             const transporter = nodemailer.createTransport({
@@ -104,11 +104,11 @@ router.post('/user-add', function (req, res, next) {
                                     rejectUnauthorized: false
                                 }
                             });
-                            text="User "+document.sys_username+" has been added to SKDC your temporary password is: "+password+" please change it clicking on the button below";
+                            text="User "+document.sys_username+" has been added to MAICS.<br>Your temporary password is: "+password+" please change it clicking on the button below";
                             var message = {
                                 from: config.maics.admin_mail,
                                 to: document.email,
-                                subject: "SKDC - User "+document.sys_username+" added",
+                                subject: "MAICS - User "+document.sys_username+" added",
                                 html: util.format(mail.standard , text)
                             };
 
