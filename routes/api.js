@@ -51,7 +51,6 @@ router.get('/host-add', function (req, res, next) {
         hostname: req.query.hostname,
         ip: req.query.ip,
         port: req.query.port,
-        cluster: req.query.cluster,
         proxy: req.query.proxy
     };
 
@@ -59,8 +58,7 @@ router.get('/host-add', function (req, res, next) {
         .then(
             function () {
                 var addU = mdb.addDocument("hosts", document);
-                var addG = mdb.updDocument("clusters", {name: req.query.cluster}, {$push: {members: document}});
-                Promise.all([addU, addG])
+                Promise.all([addU])
                     .then(
                         function () {
                             log('[+] Host '+document.hostname+' Successfully added via API, client ip: '+req.ip.replace(/f/g, "").replace(/:/g, ""),app_log);

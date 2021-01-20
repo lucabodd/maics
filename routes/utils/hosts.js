@@ -22,6 +22,18 @@ const exec = require('child_process').exec
 const maics_dir = config.maics.dir
 const maics_user = config.maics.user
 
+//Utils
+var UTILS = require("../../modules/utils");
+var utils = new UTILS();
+
+//AES
+var AES_256_CFB = require("../../modules/aes-256-cfb");
+var aes_256_cfb = new AES_256_CFB();
+
+//LDAP
+var LDAP = require("../../modules/ldap");
+var ldap = new LDAP(config.ldap);
+
 router.post('/host-add', function (req, res, next) {
     var req_hostgroups = req.body.hostgroups;
     if(!( req_hostgroups instanceof Array)){
@@ -34,7 +46,7 @@ router.post('/host-add', function (req, res, next) {
         hostgroups: req_hostgroups.join(" "),
         proxy: req.body.proxy,
         connection: "unreachable",
-        connection_detail: "Pending connection ...", //detail of connection error - string is base64 encoded
+        connection_detail: "Pending connection test ...",
         ecdsaPublicKey: ""
     };
 
@@ -102,12 +114,37 @@ router.get('/host-delete', function (req, res, next) {
                 function () {
                     var p1 = mdb.delDocument("hosts", {"hostname": host});
                     var p2 = mdb.updManyDocuments("hostgroups", {},  {$pull : { "members" : {"hostname" : host}}});
-                    var p3 = mdb.delDocument("access", {"hostname" : host});
-                    Promise.all([p1, p2, p3])
+                    var p3 = mdb.delDocument("access_users", {"hostname" : host});
+                    var p4 = mdb.delDocument("access_groups", {"hostname" : host});
+                    var p5 = mdb.delDocument("access_robots", {"hostname" : host});
+                    var p6 = mdb.findManyDocuments("robots", {"assigned_hosts" : host});
+                    Promise.all([p1, p2, p3, p4, p5, p6])
                         .then(
-                            function () {
+                            function (value) {
+                                //if value returns only one element convert to array
+                                value[5].forEach(function(robo_access){
+                                    hashsum = utils.hashsum(robo_access.assigned_hosts)
+                                    sshPublicKey = aes_256_cfb.AESdecrypt(hashsum, robo_access.sshPublicKey);
+                                    index = robo_access.assigned_hosts.indexOf(host);
+                                    robo_access.assigned_hosts.splice(index, 1);
+                                    hashsum = utils.hashsum(robo_access.assigned_hosts)
+                                    sshPublicKey = aes_256_cfb.AESencrypt(hashsum, sshPublicKey);
+
+                                    p1 = mdb.updDocument("robots", {"sys_username": robo_access.sys_username}, {$set: { sshPublicKey: sshPublicKey, assigned_hosts: robo_access.assigned_hosts }})
+                                    p2 = ldap.modKey(robo_access.sys_username, sshPublicKey)
+                                    Promise.all([p1, p2])
+                                    .then(
+                                        function () {
+                                            console.log("ok")
+                                        },
+                                        function (err){
+                                            console.log(err)
+                                        }
+                                    );
+                                });
                                 log('[+] Host '+host+' Successfully deleted from user : '+req.session.email, app_log);
                                 res.redirect('/hosts/management?error=false');
+
                             },
                             function (err) {
                                 log('[-] Connection to MongoDB has been established, but no query cannot be satisfied, reason: '+err.message, app_log);

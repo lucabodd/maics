@@ -14,7 +14,7 @@ var mongo_instance = config.mongo.instance
 //random string generation
 var randomstring = require("randomstring");
 
-//RSA
+//AES
 var AES_256_CFB = require("../../modules/aes-256-cfb");
 var aes_256_cfb = new AES_256_CFB();
 
