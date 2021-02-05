@@ -367,8 +367,16 @@ router.get('/access-robot-delete', function (req, res, next) {
 /****************************************
  *        report and hournal download   *
  ****************************************/
- router.get('/download-report', function (req, res, next) {
-         res.download(config.maics.dir+"report/access-mtrx.xlsx");
+ router.get('/download-group-host-access-matrix-report', function (req, res, next) {
+         res.download(config.maics.dir+"reports/group-host-access-matrix.xlsx");
+ });
+ 
+ router.get('/download-robot-host-access-matrix-report', function (req, res, next) {
+         res.download(config.maics.dir+"reports/robot-host-access-matrix.xlsx");
+ });
+
+ router.get('/download-user-host-access-matrix-report', function (req, res, next) {
+         res.download(config.maics.dir+"reports/user-host-access-matrix.xlsx");
  });
 
  router.get('/download-journal', function (req, res, next) {

@@ -143,7 +143,7 @@ router.post('/key-unlock', function (req, res, next) {
                             .then(
                                 function(){
                                     diffHours = ztime.hoursDiff(user.key_last_unlock); //user from first find
-                                    if(diffHours<9)
+                                    if(diffHours<config.maics.ssh_key_lifetime/3600)
                                     {
                                         log("[+] User "+req.session.email+" successfully unlocked his SSH key", app_log);
                                         log("[+] User "+req.session.email+" successfully unlocked his SSH key. request occurred from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);

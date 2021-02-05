@@ -53,13 +53,38 @@ html(lang='en')
                         .col-md-6
                             .card.card-g-primary
                               .card-header
-                                h5 Download Access Matrix
+                                h5 Download Users Access Matrix
                               .card-body
-                                p Here in MAICS each action performed by: users, technicians and administrators are tracked in a journal log file.
-                                p click the button below to download the journaling file.
-                                a.btn.btn-pill.btn-light(href="/utils/download-report")
+                                p Here you can download an .xlsx report file containing the actual status
+                                p of who can access what resource of the system.
+                                p Unsing the button below you will retrive a report containing infromation about User-Host grants.
+                                a.btn.btn-pill.btn-light(href="/utils/download-user-host-access-matrix-report")
                                     i.fa.fa-download
                                     | &nbsp; Download .xlsx File
+                      .row
+                          .col-md-6
+                              .card.card-g-primary
+                                .card-header
+                                  h5 Download Robots Access Matrix
+                                .card-body
+                                    p Here you can download an .xlsx report file containing the actual status
+                                    p of who can access what resource of the system.
+                                    p Unsing the button below you will retrive a report containing infromation about User-Robots grants.
+                                    a.btn.btn-pill.btn-light(href="/utils/download-robot-host-access-matrix-report")
+                                      i.fa.fa-download
+                                      | &nbsp; Download Journal File
+                          
+                          .col-md-6
+                              .card.card-g-primary
+                                .card-header
+                                  h5 Download Groups Access Matrix
+                                .card-body
+                                    p Here you can download an .xlsx report file containing the actual status
+                                    p of who can access what resource of the system.
+                                    p Unsing the button below you will retrive a report containing infromation about User-Groups grants.
+                                    a.btn.btn-pill.btn-light(href="/utils/download-group-host-access-matrix-report")
+                                      i.fa.fa-download
+                                      | &nbsp; Download .xlsx File
                                   
                                 
                     // Container-fluid Ends

@@ -12,9 +12,10 @@ with open(sys.argv[1]+'etc/config.json') as config_file:
 
 client = pymongo.MongoClient(config['mongo']['url'])
 mdb = client["MAICS"]
-access = mdb["access"]
-users = mdb["users"]
+access_groups = mdb["access_groups"]
+groups = mdb["groups"]
 hosts = mdb["hosts"]
+users = mdb["users"]
 
 row, col = 1,1
 ### Sheet format fars
@@ -65,12 +66,12 @@ sheet.cell(row, col).value = "Access matrix"
 sheet.cell(row, col).font = bold
 sheet.cell(row, col).fill = fillBlue
 row += 1
-sheet.cell(row, col).value = "users/hosts"
+sheet.cell(row, col).value = "group/host"
 sheet.cell(row, col).font = bold
 
 col = 2
-for u in users.find( { "role": "technician" }, {"name":1, "surname":1}).sort("surname"):
-    sheet.cell(row, col).value=u['surname']+" "+u['name']
+for g in groups.find( {}, {"name":1}).sort("name"):
+    sheet.cell(row, col).value=g['name']
     col+=1
 
 for h in hosts.find({}).sort("hostname"):
@@ -79,10 +80,8 @@ for h in hosts.find({}).sort("hostname"):
     row +=1
     sheet.cell(row, col).value=h['hostname']
     col +=1
-    for u in users.find( { "role": "technician" }, {"name":1, "surname":1}).sort("surname"):
-        acl = access.count_documents({"name": u['name'], "surname": u['surname'], "hostname": h['hostname']})
-        # explode group string, seek for each g in group of the string -> db.access_group.count({"group" : g['group'], "hostname": h['hostname'] })
-        # sum to acl
+    for g in groups.find( {}, {"name":1}).sort("name"):
+        acl = access_groups.count_documents({"group": g['name'], "hostname": h['hostname']})
         bitmap.append(acl)
     for b in bitmap:
         if(b == 1):
@@ -92,4 +91,4 @@ for h in hosts.find({}).sort("hostname"):
         col += 1
 
 book.remove(book['Sheet'])
-book.save(config['maics']['dir']+"reports/access-mtrx.xlsx")
+book.save(config['maics']['dir']+"reports/group-host-access-matrix.xlsx")
