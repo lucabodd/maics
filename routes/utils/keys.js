@@ -52,8 +52,8 @@ const u2f = require("u2f");
 
 
 
-router.get('/verify-otp', function (req, res, next) {
-        var otp = req.query.otp;
+router.post('/verify-otp', function (req, res, next) {
+        var otp = req.body.otp;
         mdb.connect(mongo_instance)
         .then(
             function(value){

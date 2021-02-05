@@ -212,7 +212,6 @@ html(lang='en')
                                     return;
                                 }
                             });
-                            console.log(response)
                             var form = $('<form action="/utils/verify-token" method="post">' +
                                           '<input type="hidden" name="loginResponse" value='+JSON.stringify(response)+'></form>');
                             $('body').append(form);
@@ -240,7 +239,10 @@ html(lang='en')
                           }
                         }
                       }, 100)
-                      window.location.replace("/utils/verify-otp?otp="+value);
+                      var form = $('<form action="/utils/verify-otp" method="post">' +
+                                    '<input type="hidden" name="otp" value='+value+'></form>');
+                      $('body').append(form);
+                      form.submit();
                     },
                     onClose: () => {
                       clearInterval(timerInterval)
