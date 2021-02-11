@@ -8,6 +8,7 @@ db.createCollection("access_users");
 db.createCollection("command_sets");
 //INDEXES
 db.users.createIndex( { "email": 1 }, { unique: true } );
+db.users.createIndex( { "sys_username": 1 }, { unique: true } );
 db.hosts.createIndex( { "hostname": 1 }, { unique: true } );
 db.groups.createIndex({ "name": 1 }, { unique: true })
 db.access_users.createIndex( { "hostname": 1, "email":1 }, { unique: true } );
@@ -15,4 +16,5 @@ db.access_groups.createIndex( { "hostname": 1, "group":1 }, { unique: true } );
 db.access_robots.createIndex( { "hostname": 1, "sys_username":1 }, { unique: true } );
 db.hostgroups.createIndex( { "name": 1}, { unique: true } );
 db.command_sets.createIndex({ "name": 1}, { unique: true });
+db.confinement_shells.createIndex({ "name": 1}, { unique: true });
 db.robots.createIndex({ "sys_username": 1}, { unique: true });

@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  strategy: free
   tasks:
 
   - name: "Creating jails directory"
@@ -27,7 +28,7 @@
       src: ../templates/confinement-shells-deploy/shell.prof.template
       dest: "/etc/apparmor.d/opt.maics_jails.{{shell_name}}"
 
-  - name: set shell mode mode
+  - name: set shell mode
     shell: "aa-{{shell_mode}} /etc/apparmor.d/opt.maics_jails.{{shell_name}}"
 
   - name: reload profile
