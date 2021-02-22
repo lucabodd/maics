@@ -14,7 +14,7 @@
         state: reloaded
 
   tasks:
-  - name: check for skdc client installed
+  - name: check for MAICS client installed
     stat:
         path: /usr/sbin/maics-ward
     register: deployed
