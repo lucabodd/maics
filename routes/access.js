@@ -42,7 +42,7 @@ router.get('/users', function(req, res, next) {
                 function () {
                     var hosts = mdb.findManyDocuments("hosts", {});
                     var hostgroups = mdb.findManyDocuments("hostgroups", {});
-                    var users = mdb.findManyDocuments("users", {},{
+                    var users = mdb.findManyDocuments("users", {"role" : "technician"},{
                             name: 1,
                             surname: 1,
                             email: 1,

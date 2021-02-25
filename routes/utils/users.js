@@ -140,10 +140,8 @@ router.post('/user-add', function (req, res, next) {
                     res.redirect('/users/management?error=true&code=\'DA001\'');
                 })
             },
-            function (err) {
-                log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-                res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-            });
+            function(err) { errors.mdb_connection_refused(res, err); }
+        );
 });
 
 
@@ -152,58 +150,52 @@ router.post('/user-add', function (req, res, next) {
 * This method generate ssh key-pair and update user entry
 */
 router.get('/delete-key', function (req, res, next) {
-
-var uname = req.query.sys_username;
-var email = req.query.email;
-mdb.connect(mongo_instance)
-.then(
-function () {
-    p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: undefined }})
-    p2 = ldap.modKey(uname, "")
-    Promise.all([p1, p2])
+    var uname = req.query.sys_username;
+    var email = req.query.email;
+    mdb.connect(mongo_instance)
     .then(
-        function () {
-            log("[+] User "+email+" ssh key deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-            log("[+] User "+email+" updated by: "+req.session.email, app_log);
-            res.redirect('/users/management?error=false');
-        },
-        function (err) {
-            log('[-] Connection cannot update MongoDB or LDAP, reason: '+err.message, app_log);
-            res.redirect('/users/management?error=true&code=\'DA001\'');
-        }
-    )
-},
-function(err){
-    log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-    res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-});
+    function () {
+        p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: undefined }})
+        p2 = ldap.modKey(uname, "")
+        Promise.all([p1, p2])
+        .then(
+            function () {
+                log("[+] User "+email+" ssh key deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                log("[+] User "+email+" updated by: "+req.session.email, app_log);
+                res.redirect('/users/management?error=false');
+            },
+            function (err) {
+                log('[-] Connection cannot update MongoDB or LDAP, reason: '+err.message, app_log);
+                res.redirect('/users/management?error=true&code=\'DA001\'');
+            }
+        )
+    },
+    function(err) { errors.mdb_connection_refused(res, err); });
 
 });
 
 
 router.get('/delete-secret', function (req, res, next) {
-var uname = req.query.sys_username;
-var email = req.query.email;
-mdb.connect(mongo_instance)
-.then(
-    function () {
-        p1 = mdb.updDocument("users", {"email": email}, {$unset: { otp_secret: 1 }})
-        .then(
-            function () {
-                log("[+] User "+email+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                log("[+] User "+email+" OTP secret deleted: "+req.session.email, app_log);
-                res.redirect('/users/management?error=false');
-            },
-            function (err) {
-                log('[-] Connection cannot update MongoDB, reason: '+err.message, app_log);
-                res.redirect('/users/management?error=true&code=\'DM001\'');
-            }
-        )
-    },
-    function(err){
-        log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-        res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-    });
+    var uname = req.query.sys_username;
+    var email = req.query.email;
+    mdb.connect(mongo_instance)
+    .then(
+        function () {
+            p1 = mdb.updDocument("users", {"email": email}, {$unset: { otp_secret: 1 }})
+            .then(
+                function () {
+                    log("[+] User "+email+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                    log("[+] User "+email+" OTP secret deleted: "+req.session.email, app_log);
+                    res.redirect('/users/management?error=false');
+                },
+                function (err) {
+                    log('[-] Connection cannot update MongoDB, reason: '+err.message, app_log);
+                    res.redirect('/users/management?error=true&code=\'DM001\'');
+                }
+            )
+        },
+        function(err) { errors.mdb_connection_refused(res, err); }
+    );
 
 });
 
@@ -230,10 +222,7 @@ router.get('/user-delete', function (req, res, next) {
                 }
             )
         },
-        function(err){
-            log('[-] Connection to MongoDB cannot be established, reason: '+err.message, app_log);
-            res.render('error',{message: "500",  error : { status: "Service unavailable", detail : "The service you requested is temporary unvailable" }});
-        }
+        function(err) { errors.mdb_connection_refused(res, err); }
     );
 });
 
