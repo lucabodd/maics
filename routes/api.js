@@ -155,8 +155,9 @@ router.post('/verify-response', function (req, res, next) {
                                             log("[+] User "+req.session.ecdsa_req_user+" successfully unlocked  ssh key.", app_log);
                                             log("[+] User "+req.session.ecdsa_req_user+" successfully unlocked ssh public key at specified timestamp. change occurred from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
                                             (async function(){
-                                                console.log("[*] waiting 5 min before relocking key");
-                                                await timer(300000);
+
+                                                console.log("[*] waiting "+config.maics.robots_ssh_key_lifetime+" seconds before relocking key");
+                                                await timer(config.maics.robots_ssh_key_lifetime*1000);
                                                 a1 = ldap.modKey(req.session.ecdsa_req_user, user.sshPublicKey)
                                                 a2 = mdb.updDocument("robots", {sys_username: req.session.ecdsa_req_user}, { $set: { sshPublicKey: user.sshPublicKey }})
                                                 Promise.all([a1,a2])

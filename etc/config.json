@@ -8,6 +8,7 @@
         "log_dir" : "/var/log/maics/",
         "run_dir" : "/var/run/maics/",
         "ssh_key_lifetime": 32400,
+        "robots_ssh_key_lifetime": 30,
         "SSL": {
             "CERT": "/var/www/maics/ssl/https/cert.pem",
             "KEY": "/var/www/maics/ssl/https/key.pem"
