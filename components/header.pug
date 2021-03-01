@@ -7,57 +7,53 @@
                 .main-header-right
                     .main-header-left.text-center
                         .logo-wrapper
-                            a(href='index.html')
+                            a(href='/home/password-change')
                                 img(src='/assets/images/logo/logo.png', alt='')
                     .mobile-sidebar(class=header_status)
                         .media-body.text-right.switch-sm
-                            label.switch.ml-3
-                                i#sidebar-toggle.font-primary( data-feather="align-center")
+                            ul
+                            li
+                                label.switch.ml-3
+                                    i#sidebar-toggle.font-primary( data-feather="align-center")
+                            li
+                                label.switch.ml-3
+                                    a.text-dark(href='#!', onclick='javascript:toggleFullScreen()')
+                                        i.font-primary(data-feather='maximize-2')
                     .vertical-mobile-sidebar
                         i.fa.fa-bars.sidebar-bar                
                     .nav-right.col.pull-right.right-menu
-                        if megamenu
-                            include megamenu
                         ul.nav-menus
-                            li
-                                form(action='#', method='get').form-inline.search-form
-                                    .form-group
-                                        .Typeahead.Typeahead--twitterUsers
-                                          .u-posRelative
-                                            input#demo-input.Typeahead-input.form-control-plaintext(type='text', name='q', placeholder='Search Your Product...')
-                                            .spinner-border.Typeahead-spinner(role='status')
-                                                span.sr-only Loading...
-                                            span.d-sm-none.mobile-search
-                                                i(data-feather='search')
-                                          .Typeahead-menu
-                            li
-                                a.text-dark(href='#!', onclick='javascript:toggleFullScreen()')
-                                    i(data-feather='maximize')
                             
-                            li.onhover-dropdown
-                                img.img-fluid.img-shadow-warning(src='/assets/images/dashboard/notification.png', alt='')
-                                ul.onhover-show-div.notification-dropdown
-                                    li.gradient-primary
-                                        h5.f-w-700 Notifications
-                                        span You have 6 unread messages
-                                    li
-                                        .media
-                                            .notification-icons.bg-success.mr-3
-                                                i.mt-0(data-feather='thumbs-up')
-                                            .media-body
-                                                h6 Someone Likes Your Posts
-                                                p.mb-0  2 Hours Ago
-                                    li.pt-0
-                                        .media
-                                            .notification-icons.bg-info.mr-3
-                                                i.mt-0(data-feather='message-circle')
-                                            .media-body
-                                                h6 3 New Comments
-                                                p.mb-0  1 Hours Ago
-                                    li.bg-light.txt-dark
-                                        a(href='#') All 
-                                        |  notification
-                        
+                            li
+                                .media-body.text-right.switch-sm
+                                    
+                            
+                            //-
+                                ### Might be used in future for notifications implementation 
+                                li.onhover-dropdown
+                                    img.img-fluid.img-shadow-warning(src='/assets/images/dashboard/notification.png', alt='')
+                                    ul.onhover-show-div.notification-dropdown
+                                        li.gradient-primary
+                                            h5.f-w-700 Notifications
+                                            span You have 6 unread messages
+                                        li
+                                            .media
+                                                .notification-icons.bg-success.mr-3
+                                                    i.mt-0(data-feather='thumbs-up')
+                                                .media-body
+                                                    h6 Someone Likes Your Posts
+                                                    p.mb-0  2 Hours Ago
+                                        li.pt-0
+                                            .media
+                                                .notification-icons.bg-info.mr-3
+                                                    i.mt-0(data-feather='message-circle')
+                                                .media-body
+                                                    h6 3 New Comments
+                                                    p.mb-0  1 Hours Ago
+                                        li.bg-light.txt-dark
+                                            a(href='#') All 
+                                            |  notification
+                             //
                             li.onhover-dropdown.p-15  
                                 span.media.user-header
                                     button.btn.btn-primary
@@ -67,27 +63,20 @@
                                   li.gradient-primary
                                         h5.f-w-600.mb-0 #{sys_username}
                                         span #{role}
+                                  if (role == "admin" || role == "technician")
+                                      li
+                                        a.text-dark(href='/keys/management') 
+                                            i(data-feather='unlock' )
+                                            | Unlock SSH Key
                                   li
-                                    i(data-feather='user') 
-                                    | Profile
+                                    a.text-dark(href='/home/password-change') 
+                                        i(data-feather='refresh-cw') 
+                                        | New Password
                                   li
-                                    i(data-feather='message-square') 
-                                    | Inbox
-                                  li
-                                    i(data-feather='file-text') 
-                                    | Taskboard
-                                  li
-                                    i(data-feather='settings') 
-                                    | Settings            
+                                    a.text-dark(href='/login') 
+                                        i(data-feather='log-out') 
+                                        | Logout        
                         .d-lg-none.mobile-toggle.pull-right
                             i(data-feather='more-horizontal')
-                    script#result-template(type='text/x-handlebars-template').
-                        <div class="ProfileCard u-cf">                        
-                        <div class="ProfileCard-avatar"><i class="pe-7s-home"></i></div>
-                        <div class="ProfileCard-details">
-                        <div class="ProfileCard-realName">{{sys_username}}</div>
-                        </div>
-                        </div>
-                    script#empty-template(type='text/x-handlebars-template').
-                        <div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div>
-// Page Header Ends                              
+
+// Page Header Ends     
