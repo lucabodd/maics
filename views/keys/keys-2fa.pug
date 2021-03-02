@@ -59,7 +59,6 @@ html(lang='en')
                                                     .card-header
                                                         h5 Setup Google Authenticator
                                                         span Download Google Authenticator on your Android/iOS device, scan this QRcode, and once you are done click on save button below. Scanning this QR will meke you able to generate an authentication OTPs
-                                                        a(href='/home/keys') manage SSH Key page
                                                     .card-body
                                                         .row.justify-content-center
                                                             img(src=otp_qr)
@@ -76,7 +75,7 @@ html(lang='en')
                                                     .card-header
                                                         h5 Google Authenticator Enrolled
                                                         span You already registered the secret.
-                                                        a(href='/home/keys') manage SSH Key page
+                                                        a(href='/keys/management') manage SSH Key page
                                                     .card-body
                                                         .row.justify-content-center
                                                             .p-10 
@@ -91,7 +90,6 @@ html(lang='en')
                                                     .card-header
                                                         h5 Google Authenticator
                                                         span Administrator disabled google authenticator for #{sys_username}
-                                                        a(href='/home/keys') manage SSH Key page
                                                     .card-body
                                                         .row.justify-content-center
                                                             .p-10 
@@ -110,7 +108,6 @@ html(lang='en')
                                                   .card-header
                                                       h5 Setup hardware token
                                                       span Please insert the company providen security hardware key, click 'Enroll Token' and press the key's button when it blinks, then wait till your security token is registered in MAICS system.
-                                                      a(href='/home/keys') manage SSH Key page
                                                   .card-body    
                                                       .row.justify-content-center
                                                           .p-10 
@@ -124,7 +121,7 @@ html(lang='en')
                                                   .card-header
                                                       h5 Hardware Token Enrolled
                                                       span You already registered the token.
-                                                      a(href='/home/keys') manage SSH Key page
+                                                      a(href='/keys/management') manage SSH Key page
                                                   .card-body    
                                                       .row.justify-content-center
                                                           .p-10 
@@ -135,11 +132,9 @@ html(lang='en')
                                                                       i.pe-7s-like2
                                                                       | &nbsp;&nbsp;Token Enrolled
                                             else
-                                                      //otp disabled by admin
                                                       .card-header
                                                           h5 Hardware token
                                                           span Administrator disabled token authentication for #{sys_username}
-                                                          a(href='/home/keys') manage SSH Key page
                                                       .card-body
                                                           .row.justify-content-center
                                                               .p-10 

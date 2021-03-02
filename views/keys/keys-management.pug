@@ -49,102 +49,141 @@ html(lang='en')
                                     li 
                                         i.fa.fa-caret-right.txt-secondary.m-r-10 
                                         | Paste below the content of your id_rsa.pub or drag & drop id_rsa.pub file
+                          
+                          if !(token_verified==token_enabled && otp_verified==otp_enabled)
+                              .card
+                                .card-header
+                                    h5 Unlock SSH Public Key
+                                    span To starting access server via ssh unlock your SSH Key verifying identity through all authentication steps setted up
+                                .card-body
+                                    .row
+                                      .col-sm-6
+                                         //GOTP CASES
+                                         if !otp_enabled 
+                                          .card
+                                            .card-header
+                                                h5 Google Authenticator
+                                                span Administrator disabled google authenticator for #{sys_username}
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/gotp-disabled.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            button.btn.btn-pill.btn-danger(disabled)
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;OTP Disabled 
+                                         else if otp_unenrolled 
+                                          .card
+                                            .card-header
+                                                h5 Google Authenticator
+                                                span You do not have enrolled the OTP secret yet.
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/gotp-disabled.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            a.btn.btn-pill.btn-danger(href="/keys/2fa")
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;Enroll OTP
+                                                                 
+                                         else if !otp_verified && otp_enabled
+                                          .card
+                                            .card-header
+                                                h5 Google authenticator
+                                                span Insert below the OTP shown in google authenticator app
+                                            .card-body
+                                                .row
+                                                    .col-sm-2
+                                                        img(src="../../assets/images/gotp-mini.png")
+                                                    .col-sm-10
+                                                        input(type="text" name="otp" id="pincode-input")
+                                         else if otp_verified 
+                                          .card
+                                            .card-header
+                                                h5 Google Authenticator
+                                                span You successfully verified your identity via OTP
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/gotp-verified.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            button.btn.btn-pill.btn-success(disabled)
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;OTP Verified
+                                                 
+                                                           
+                                      //end of GOTP cases
+                                      //Hardware token verification status
+                                      .col-sm-6
+                                         if !token_enabled 
+                                          .card
+                                            .card-header
+                                                h5 Token Disabled
+                                                span Administrator disabled token authentication for #{sys_username}
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/yubikey-disabled.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            button.btn.btn-pill.btn-danger(disabled)
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;Token Disabled  
+                                         
+                                         else if token_unenrolled 
+                                          .card
+                                            .card-header
+                                                h5 Token Unenrolled
+                                                span You do not have enrolled the token yet.
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/yubikey-disabled.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            a.btn.btn-pill.btn-danger(href="/keys/2fa")
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;Enroll token 
+                            
+                                         else if !token_verified && token_enabled
+                                          .card
+                                            .card-header
+                                                h5 Hardware token
+                                                span Insert registered token in a usb port and click the button below
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/yubikey.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            button.btn.btn-pill.btn-primary(id="verify-button")
+                                                                i.fa.fa-check
+                                                                | &nbsp;&nbsp;Verify Token
+                                         
+                                         else if token_verified 
+                                          .card
+                                            .card-header
+                                                h5 Hardware token verified
+                                                span You successfully verified your identity via hardware token
+                                            .card-body
+                                                .row.justify-content-center
+                                                    .p-10 
+                                                            img(src="../../assets/images/yubikey-verified.png")
+                                                .row.justify-content-center
+                                                    .p-10
+                                                            button.btn.btn-pill.btn-success(disabled)
+                                                                i.pe-7s-like2
+                                                                | &nbsp;&nbsp;Token Verified
+                                     
+
                           .card
-                            .card-header
-                                h5 Unlock SSH Public Key
-                                span To starting access server via ssh unlock your SSH Key verifying identity through all authentication steps setted up
-                            .card-body
-                                .row
-                                  .col-sm-6
-                                     //GOTP CASES
-                                     if !otp_verified && otp_enabled
-                                      .card
-                                        .card-header
-                                            h5 Google authenticator
-                                            span Insert below the OTP shown in google authenticator app
-                                        .card-body
-                                            .row
-                                                .col-sm-2
-                                                    img(src="../../assets/images/gotp-mini.png")
-                                                .col-sm-10
-                                                    input(type="text" name="otp" id="pincode-input")
-                                     else if otp_verified 
-                                      .card
-                                        .card-header
-                                            h5 Google Authenticator
-                                            span You successfully verified your identity via OTP
-                                        .card-body
-                                            .row.justify-content-center
-                                                .p-10 
-                                                        img(src="../../assets/images/gotp-verified.png")
-                                            .row.justify-content-center
-                                                .p-10
-                                                        button.btn.btn-pill.btn-success(disabled)
-                                                            i.pe-7s-like2
-                                                            | &nbsp;&nbsp;OTP Verified
-                                             
-                                     else if !otp_enabled 
-                                      .card
-                                        .card-header
-                                            h5 Google Authenticator
-                                            span Administrator disabled google authenticator for #{sys_username}
-                                        .card-body
-                                            .row.justify-content-center
-                                                .p-10 
-                                                        img(src="../../assets/images/gotp-disabled.png")
-                                            .row.justify-content-center
-                                                .p-10
-                                                        button.btn.btn-pill.btn-danger(disabled)
-                                                            i.pe-7s-like2
-                                                            | &nbsp;&nbsp;OTP Disabled                   
-                                  //end of GOTP cases
-                                  //Hardware token verification status
-                                  .col-sm-6
-                                     if !token_verified && token_enabled
-                                      .card
-                                        .card-header
-                                            h5 Hardware token
-                                            span Insert registered token in a usb port and click the button below
-                                        .card-body
-                                            .row.justify-content-center
-                                                .p-10 
-                                                        img(src="../../assets/images/yubikey.png")
-                                            .row.justify-content-center
-                                                .p-10
-                                                        button.btn.btn-pill.btn-primary(id="verify-button")
-                                                            i.fa.fa-check
-                                                            | &nbsp;&nbsp;Verify Token
-                                     else if token_verified 
-                                      .card
-                                        .card-header
-                                            h5 Hardware token verified
-                                            span You successfully verified your identity via hardware token
-                                        .card-body
-                                            .row.justify-content-center
-                                                .p-10 
-                                                        img(src="../../assets/images/yubikey-verified.png")
-                                            .row.justify-content-center
-                                                .p-10
-                                                        button.btn.btn-pill.btn-success(disabled)
-                                                            i.pe-7s-like2
-                                                            | &nbsp;&nbsp;Token Verified
-                                     else if !otp_enabled 
-                                      .card
-                                        .card-header
-                                            h5 Token Disabled
-                                            span Administrator disabled token authentication for #{sys_username}
-                                        .card-body
-                                            .row.justify-content-center
-                                                .p-10 
-                                                        img(src="../../assets/images/yubikey-disabled.png")
-                                            .row.justify-content-center
-                                                .p-10
-                                                        button.btn.btn-pill.btn-danger(disabled)
-                                                            i.pe-7s-like2
-                                                            | &nbsp;&nbsp;Token Disabled  
-                          .card
+                              // | 1 #{key_lock} 2 #{token_enabled} 3 #{token_verified} 4 #{otp_enabled} 5 #{otp_verified}
+                              // | #{token_verified==token_enabled && otp_verified==otp_enabled}
                               if key_lock
-                                if key_verified==key_enabled && otp_verified==otp_enabled
+                                if (token_verified==token_enabled && otp_verified==otp_enabled)
                                       .card-header
                                           h5.card-title Request Key unlock
                                           span You successfully verified all authentication factors, now you can unlock the key
@@ -155,17 +194,16 @@ html(lang='en')
                                                       button.form-control.btn.btn-pill.btn-primary
                                                           i.fa.fa-unlock
                                                           | &nbsp;&nbsp;Request Key Unlock
-                                else
-                                      .card-header
-                                          h5.card-title Verify authentication factors 
-                                          span You need to verify all the authentication factors above before being able to request a key unlock.
-                                      .card-body
-                                          .row.justify-content-center
-                                              .col-md-8
-                                                  form.form.theme-form
-                                                      button.form-control.btn.btn-pill.btn-danger(disabled)
-                                                          i.fa.fa-lock
-                                                          | &nbsp;&nbsp;Request Key Unlock
+                                      .card-header.card-body
+                                          div.alert.alert-info
+                                              b Request Key unlock! 
+                                              | You succesfully verified all the authentication factors. request a key unlock to be ready to go!
+                              
+                                else 
+                                  .card-header.card-body
+                                      div.alert.alert-danger
+                                          b Key Locked! 
+                                          | Your key is locked, you won't be able to edit key or login via SSH until you unlock your key. Please verify all authentication factors above.
                                   
                           .card
                                 if !key_lock
@@ -191,12 +229,8 @@ html(lang='en')
                                                                 else
                                                                     i.pe-7s-upload
                                                                     | &nbsp;&nbsp; Upload key
-                                else 
-                                    .card-header.card-body
-                                        div.alert.alert-danger
-                                            b Key Locked! 
-                                            | Your key is locked, you won't be able to edit key or login via ssh until you unlock your key 
-                    // Container-fluid Ends
+                                
+                // Container-fluid Ends
                 include ../../components/footer
         include ../../components/footer-files
         script(src='../../assets/js/bootstrap-pincode-input.js')

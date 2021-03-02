@@ -40,6 +40,15 @@ router.post('/user-add', function (req, res, next) {
     if(!( req_groups instanceof Array)){
         req_groups = req_groups.split();
     }
+    //MFA enabled disabled
+    var otp_enabled = false
+    var token_enabled = false
+    if(req.body.otp_enabled == "on"){
+        otp_enabled = true;
+    }
+    if(req.body.token_enabled == "on"){
+        token_enabled = true;
+    }
     //format system user
     var document = {
         email: req.body.uid+"@"+req.body.domain,
@@ -55,8 +64,8 @@ router.post('/user-add', function (req, res, next) {
         otp_secret: "",
         token_publicKey: "",
         token_keyHandle: "",
-        otp_enabled: true,
-        token_enabled: false
+        otp_enabled: otp_enabled,
+        token_enabled: token_enabled
     };
 
     mdb.connect(mongo_instance)
@@ -149,13 +158,13 @@ router.post('/user-add', function (req, res, next) {
 * add new user in DB
 * This method generate ssh key-pair and update user entry
 */
-router.get('/delete-key', function (req, res, next) {
+router.get('/user-delete-key', function (req, res, next) {
     var uname = req.query.sys_username;
     var email = req.query.email;
     mdb.connect(mongo_instance)
     .then(
     function () {
-        p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: undefined }})
+        p1 = mdb.updDocument("users", {"email": email}, {$set: { sshPublicKey: "" }})
         p2 = ldap.modKey(uname, "")
         Promise.all([p1, p2])
         .then(
@@ -175,17 +184,86 @@ router.get('/delete-key', function (req, res, next) {
 });
 
 
-router.get('/delete-secret', function (req, res, next) {
-    var uname = req.query.sys_username;
-    var email = req.query.email;
+router.post('/user-delete-otp-secret', function (req, res, next) {
+    var sys_username = req.body.sys_username;
     mdb.connect(mongo_instance)
     .then(
         function () {
-            p1 = mdb.updDocument("users", {"email": email}, {$unset: { otp_secret: 1 }})
+            p1 = mdb.updDocument("users", {"sys_username": sys_username}, {$set: { otp_secret: "" , sshPublicKey: "" }})
+            p2 = ldap.modKey(sys_username, "");
+            Promise.all([p1,p2])
             .then(
                 function () {
-                    log("[+] User "+email+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                    log("[+] User "+email+" OTP secret deleted: "+req.session.email, app_log);
+                    log("[+] User "+sys_username+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                    log("[+] User "+sys_username+" OTP secret deleted: "+req.session.email, app_log);
+                    res.redirect('/users/management?error=false');
+                },
+                function (err) {
+                    log('[-] Connection cannot update MongoDB, reason: '+err.message, app_log);
+                    res.redirect('/users/management?error=true&code=\'DM001\'');
+                }
+            )
+        },
+        function(err) { errors.mdb_connection_refused(res, err); }
+    );
+
+});
+
+router.post('/user-delete-token-secret', function (req, res, next) {
+    var sys_username = req.body.sys_username;
+
+    mdb.connect(mongo_instance)
+    .then(
+        function () {
+            p1 = mdb.updDocument("users", {"sys_username": sys_username}, {$set: { token_publicKey: "", token_keyHandle: "", sshPublicKey: "" }})
+            p2 = ldap.modKey(sys_username, "");
+            Promise.all([p1,p2])
+            .then(
+                function () {
+                    log("[+] User "+sys_username+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                    log("[+] User "+sys_username+" OTP secret deleted: "+req.session.email, app_log);
+                    res.redirect('/users/management?error=false');
+                },
+                function (err) {
+                    log('[-] Connection cannot update MongoDB, reason: '+err.message, app_log);
+                    res.redirect('/users/management?error=true&code=\'DM001\'');
+                }
+            )
+        },
+        function(err) { errors.mdb_connection_refused(res, err); }
+    );
+
+});
+
+router.post('/user-change-mfa-mode', function (req, res, next) {
+    var sys_username = req.body.sys_username;
+    var otp_enabled = req.body.otp_enabled;
+    var token_enabled = req.body.token_enabled;
+
+    mdb.connect(mongo_instance)
+    .then(
+        function () {
+            token_enabled = (token_enabled == 'true')
+            otp_enabled = (otp_enabled == 'true')
+
+            //selection to not overwrite with "" an enrolled secret
+            if (!token_enabled)
+                p1 = mdb.updDocument("users", {"sys_username": sys_username}, {$set: { token_enabled: token_enabled, token_publicKey: "", token_keyHandle:"", sshPublicKey: "" }})
+            else
+                p1 = mdb.updDocument("users", {"sys_username": sys_username}, {$set: { token_enabled: token_enabled, sshPublicKey: "" }})
+
+            if (!otp_enabled)
+                p2 =  mdb.updDocument("users", {"sys_username": sys_username}, {$set: { otp_enabled: otp_enabled, otp_secret: "", sshPublicKey: "" }})
+            else
+                p2 =  mdb.updDocument("users", {"sys_username": sys_username}, {$set: { otp_enabled: otp_enabled, sshPublicKey: "" }})
+
+            p3 = ldap.modKey(sys_username, "");
+
+            Promise.all([p1,p2,p3])
+            .then(
+                function () {
+                    log("[+] User "+sys_username+" OTP secret deleted in specified timestamp by: "+req.session.email+" from"+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                    log("[+] User "+sys_username+" OTP secret deleted: "+req.session.email, app_log);
                     res.redirect('/users/management?error=false');
                 },
                 function (err) {
@@ -200,20 +278,20 @@ router.get('/delete-secret', function (req, res, next) {
 });
 
 
-router.get('/user-delete', function (req, res, next) {
-    var email = req.query.email;
+router.post('/user-delete', function (req, res, next) {
+    var sys_username = req.body.sys_username;
     mdb.connect(mongo_instance)
     .then(
         function () {
-            var p1 = mdb.delDocument("users", {"email": email});
-            var p2 = mdb.updManyDocuments("groups", {},  {$pull : { "members" : {"email" : email}}});
-            var p3 = mdb.delManyDocuments("access_users", {"email" : email});
-            var p4 = ldap.delUser(req.query.sys_username);
+            var p1 = mdb.delDocument("users", {"sys_username": sys_username});
+            var p2 = mdb.updManyDocuments("groups", {},  {$pull : { "members" : {"sys_username" : sys_username}}});
+            var p3 = mdb.delManyDocuments("access_users", {"sys_username" : sys_username});
+            var p4 = ldap.delUser(sys_username);
             Promise.all([p1, p2, p3, p4])
             .then(
                 function () {
-                    log("[+] User "+email+" deleted in specified timestamp by: "+req.session.email+" from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
-                    log("[+] User "+email+" deleted from LDAP and MongoDB by: "+req.session.email, app_log);
+                    log("[+] User "+sys_username+" deleted in specified timestamp by: "+req.session.email+" from "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'), journal_log);
+                    log("[+] User "+sys_username+" deleted from LDAP and MongoDB by: "+req.session.email, app_log);
                     res.redirect('/users/management?error=false');
                 },
                 function (err) {

@@ -70,26 +70,48 @@ html(lang='en')
                                     .f1-buttons
                                       button.btn.btn-primary.btn-next(type='button') Next
                                   fieldset
-                                    .form-group
-                                      label(for='f1-uid') Mail UID:
-                                      input#f1-uid.form-control(type='text', placeholder="UID..."  name='uid' required)
-                                    .form-group.m-form__group
-                                      label Domain:
-                                      .input-group
-                                        .input-group-prepend
-                                          span.input-group-text @
-                                        input.form-control(type='text', placeholder='E-mail Domain...' name='domain' required)
-                                    .form-group
-                                        label(for='f1-role') MAICS Role:
-                                        select#f1-role.js-example-basic-single(name="user_role" required style="width: 100%;")
-                                            option(value="" selected="selected" disabled) Select a Role
-                                            option(value="admin") Admin
-                                            option(value="technician") Technician
-                                            option(value="user") User
+                                    .row
+                                        .col-sm-8
+                                            .form-group
+                                              label(for='f1-uid') Mail UID:
+                                              input#f1-uid.form-control(type='text', placeholder="UID..."  name='uid' required)
+                                            .form-group.m-form__group
+                                              label Domain:
+                                              .input-group
+                                                .input-group-prepend
+                                                  span.input-group-text @
+                                                input.form-control(type='text', placeholder='E-mail Domain...' name='domain' required)
+                                            .form-group
+                                                label(for='f1-role') MAICS Role:
+                                                select#f1-role.js-example-basic-single(name="user_role" required style="width: 100%;")
+                                                    option(value="" selected="selected" disabled) Select a Role
+                                                    option(value="admin") Admin
+                                                    option(value="technician") Technician
+                                                    option(value="user") User
+                                        .col-sm-4
+                                          br
+                                          .card
+                                               .card-body
+                                                h6 MFA:
+                                                .row.switch-showcase.height-equal
+                                                  .col-sm-12
+                                                    .media
+                                                      label.col-form-label.m-r-10 Google Authenticator
+                                                      .media-body.text-right.icon-state
+                                                        label.switch
+                                                          input.checkbox(type='checkbox' name="otp_enabled")
+                                                          span.switch-state
+                                                    .media
+                                                      label.col-form-label.m-r-10 Yubikey
+                                                      .media-body.text-right.icon-state
+                                                        label.switch
+                                                          input.checkbox(type='checkbox', checked='' name="token_enabled")
+                                                          span.switch-state
                                     .f1-buttons
                                       button.btn.btn-primary.btn-previous(type='button') Previous
                                       | &nbsp;
                                       button.btn.btn-primary.btn-next(type='button') Next
+                                  
                                   fieldset
                                      .form-group.select2-drpdwn
                                          label(for='f1-groups') Add user to groups:
@@ -156,31 +178,23 @@ html(lang='en')
                                                                             div.dropdown-menu(aria-labelledby="dropdownMenuButton")
                                                                                 h6.dropdown-header Account Actions
                                                                                 div.dropdown-divider
-                                                                                if u.sshPublicKey
-                                                                                    button.dropdown-item.btn.btn-light.txt-dark(onclick="location.href='/utils/delete-key?sys_username=" + u.sys_username + "&email="+ u.email +"'" style="border-radius: 0px;") Delete SSH public key
-                                                                                else
-                                                                                    button.dropdown-item.btn.btn-light(disabled style="border-radius: 0px;") User SSH public key not set
-                                                                                if u.otp_secret
-                                                                                    button.dropdown-item.btn.btn-light.txt-dark(onclick="location.href='/utils/delete-secret?sys_username=" + u.sys_username + "&email="+ u.email +"'" style="border-radius: 0px;") Delete OTP secret
-                                                                                else
-                                                                                    button.dropdown-item.btn.btn-light(disabled style="border-radius: 0px;") User OTP secret not set
-                                                                                button.dropdown-item.btn.btn-danger(onclick="confirm('"+u.email+"','"+u.sys_username+"');" style="border-radius: 0px;") Delete User
-                                    
-                            //-                            
-                                .card-footer
-                                  h5.card-title Sync LDAP server
-                                    .mb-2
-                                        br
-                                        form(method='GET' action='/utils/ldap-sync')
-                                            button.btn.btn-primary(style="width: 12%")
-                                                i.fa.fa-spin.fa-refresh   //                       
+                                                                                if u.role == "admin" || u.role=="technician"
+                                                                                    if u.sshPublicKey
+                                                                                        button.dropdown-item.btn.btn-light.txt-dark(onclick="location.href='/utils/user-delete-key?sys_username=" + u.sys_username + "&email="+ u.email +"'" style="border-radius: 0px;") Delete SSH public key
+                                                                                    if u.otp_secret
+                                                                                        button.dropdown-item.btn.btn-light.txt-dark(onclick="confirm_delete_otp_secret('" + u.sys_username +"');" style="border-radius: 0px;") Delete OTP secret
+                                                                                    if u.token_publicKey
+                                                                                        button.dropdown-item.btn.btn-light.txt-dark(onclick="confirm_delete_token_secret('" + u.sys_username +"');" style="border-radius: 0px;") Delete Token secret
+                                                                                    button.dropdown-item.btn.btn-light.txt-dark(onclick="change_mfa_mode('" + u.sys_username +"',"+u.token_enabled+","+u.otp_enabled+");" style="border-radius: 0px;") Change MFA mode
+                                                                                button.dropdown-item.btn.btn-danger(onclick="confirm_delete_user('"+u.sys_username+"');" style="border-radius: 0px;") Delete User
+                                                   
                                                     
                             
                     // Container-fluid Ends
                 include ../../components/footer
         include ../../components/footer-files
         script(type='text/javascript').
-            function confirm(email, sys_username)
+            function confirm_delete_user(sys_username)
             {
                 Swal.fire({
                       title: 'Are you sure?',
@@ -192,7 +206,10 @@ html(lang='en')
                       confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                   if (result.value) {
-                    window.location.replace("/utils/user-delete?email=" + email + "&sys_username="+sys_username);
+                      var form = $(`<form action="/utils/user-delete" method="post">` +
+                                    `<input type="hidden" name="sys_username" value="`+sys_username+`"></form>`);
+                      $('body').append(form);
+                      form.submit();
                   }
                   else if (result.dismiss === Swal.DismissReason.cancel) {
                     Swal.fire({
@@ -205,5 +222,148 @@ html(lang='en')
                   }
                 })
             }
+            
+            function confirm_delete_token_secret(sys_username)
+            {
+                Swal.fire({
+                      title: 'Are you sure?',
+                      text: "If you delete the token secret, user's SSH public key will be removed!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.value) {
+                      var form = $(`<form action="/utils/user-delete-token-secret" method="post">` +
+                                    `<input type="hidden" name="sys_username" value="`+sys_username+`"></form>`);
+                      $('body').append(form);
+                      form.submit();
+                  }
+                  else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Canceled',
+                        text: "token secret elimination aborted.",
+                        icon: 'success',
+                        timer: 1000,
+                        timerProgressBar: true
+                      })
+                  }
+                })
+            }
+            
+            function confirm_delete_otp_secret(sys_username)
+            {
+                Swal.fire({
+                      title: 'Are you sure?',
+                      text: "If you delete the OTP secret, user's SSH public key will be removed!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                  if (result.value) {
+                      var form = $(`<form action="/utils/user-delete-otp-secret" method="post">` +
+                                    `<input type="hidden" name="sys_username" value="`+sys_username+`"></form>`);
+                      $('body').append(form);
+                      form.submit();
+                  }
+                  else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Canceled',
+                        text: "OTP secret elimination aborted.",
+                        icon: 'success',
+                        timer: 1000,
+                        timerProgressBar: true
+                      })
+                  }
+                })
+            }
+            
+            function change_mfa_mode(sys_username, token_enabled, otp_enabled)
+            {
+                //change value from true/false to checked
+                var token_enabled_checked = "";
+                var otp_enabled_checked = "";
+                if (token_enabled){
+                    token_enabled_checked = "checked";
+                }
+                if(otp_enabled){
+                    otp_enabled_checked = "checked";
+                }
+
+                Swal.fire({
+                  title: 'Change Multi-factor authentication setup for '+ sys_username,
+                  html: `<p> Note that if you change Multi-factor authentication setup SSH publickey stored in the system will be removed and user will need to enroll SSH key again. <\p>
+                            <div class="card-body">
+                            <h6>Shell Mode:</h6>
+                            <div class="row switch-showcase height-equal">
+                                <div class="col-sm-12">
+                                    <div class="media">
+                                    <label class="col-form-label m-r-10">Google Authenticator</label>
+                                    <div class="media-body text-right icon-state">
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" id="new_otp_enabled" name="new_otp_enabled" `+otp_enabled_checked+`><span class="switch-state"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="media">
+                                <label class="col-form-label m-r-10">Yubikey</label>
+                                <div class="media-body text-right icon-state">
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" id="new_token_enabled" name="new_token_enabled" `+token_enabled_checked+`><span class="switch-state"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            </div></div></div>`,
+                  showCancelButton: true,
+                  confirmButtonText: 'Change MFA Mode',
+                  focusConfirm: false,
+                  preConfirm: () => {
+                    const new_otp_enabled_value = Swal.getPopup().querySelector('#new_otp_enabled').checked
+                    const new_token_enabled_value = Swal.getPopup().querySelector('#new_token_enabled').checked
+
+                    return { new_otp_enabled: new_otp_enabled_value, new_token_enabled: new_token_enabled_value }
+                  }
+                }).then((result) => {
+                    if (result.value) {
+                        
+                        console.log(otp_enabled);
+                        console.log(result.value.new_otp_enabled);
+                        console.log(token_enabled);
+                        console.log(result.value.new_token_enabled);
+                        
+                        if (result.value.new_otp_enabled == otp_enabled && token_enabled == result.value.new_token_enabled){
+                            Swal.fire({
+                                title: 'Canceled',
+                                text: "No configuration changes detected.",
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: true
+                              })
+                        }
+                        else{
+                            var form = $(`<form action="/utils/user-change-mfa-mode" method="post">` +
+                                          `<input type="hidden" name="sys_username" value="`+sys_username+`">` +
+                                          `<input type="hidden" name="otp_enabled" value=`+result.value.new_otp_enabled+`>` +
+                                          `<input type="hidden" name="token_enabled" value=`+result.value.new_token_enabled+`></form>`);
+                            $('body').append(form);
+                            form.submit();
+                        }
+
+                    }
+                    else if (result.dismiss === Swal.DismissReason.cancel) {
+                      Swal.fire({
+                          title: 'Canceled',
+                          text: "aborted.",
+                          icon: 'success',
+                          timer: 1000,
+                          timerProgressBar: true
+                        })
+                    }
+                })
+            }
+
             
     

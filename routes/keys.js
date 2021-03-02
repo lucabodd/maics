@@ -39,10 +39,14 @@ router.get('/management', function (req, res, next) {
                         .then(
                             function (value) {
                                 //parse enabled methods
-                                if (value.otp_secret == "" && !value.otp_enabled)
-                                    req.session.otp_verified = true
-                                if (value.token_publicKey == "" && !value.otp_enabled)
-                                    req.session.token_verified = true
+                                // check token enroll status
+                                var otp_unenrolled = false;
+                                var token_unenrolled = false;
+                                if (value.otp_secret == "" && value.otp_enabled)
+                                    otp_unenrolled = true;
+                                if (value.token_publicKey == "" && value.token_enabled)
+                                    token_unenrolled = true
+
                                 if (value.token_keyHandle)
                                     req.session.u2f = u2f.request(APP_ID, value.token_keyHandle);
 
@@ -57,8 +61,10 @@ router.get('/management', function (req, res, next) {
                                     sign_challenge: JSON.stringify(req.session.u2f),
                                     otp_verified: req.session.otp_verified,
                                     otp_enabled: value.otp_enabled,
+                                    otp_unenrolled: otp_unenrolled,
                                     token_verified: req.session.token_verified,
                                     token_enabled: value.token_enabled,
+                                    token_unenrolled: token_unenrolled,
                                     key_lock: req.session.key_lock,
                                     url: config.maics.url,
                                     code: req.query.code,
@@ -92,7 +98,7 @@ router.get('/2fa', function(req, res, next) {
                                 challenge = "true";
 
                             console.log(challenge);
-                            
+
                             res.render('keys-2fa', {
                                 sys_username: value.sys_username,
                                 username: req.session.email,
