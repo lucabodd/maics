@@ -64,7 +64,7 @@ router.post('/robot-user-add', function (req, res, next) {
         sys_username: req.body.uid,
         sshPublicKey: req.body.pastedPubKey,
         pwdChangedTime: ztime.current(),
-        pwdAccountLockedTime: null,
+        pwdAccountLockedTime: "",
         key_last_unlock: "19700101000010Z",
         assigned_hosts: req_hosts,
         key_last_unlock_source: "none",

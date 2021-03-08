@@ -59,7 +59,7 @@ router.post('/user-add', function (req, res, next) {
         group: req_groups.join(" "),
         sshPublicKey: "",
         pwdChangedTime: ztime.current(),
-        pwdAccountLockedTime: null,
+        pwdAccountLockedTime: "",
         key_last_unlock: "19700101000010Z",
         otp_secret: "",
         token_publicKey: "",

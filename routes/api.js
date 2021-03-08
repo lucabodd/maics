@@ -129,7 +129,7 @@ router.post('/verify-response', function (req, res, next) {
                 mdb.findDocument("robots", { sys_username: req.session.ecdsa_req_user, assigned_hosts: req.session.ecdsa_host.hostname  })
                 .then(
                     function (user) {
-                        if(!user){
+                        if(!user || user.pwdAccountLockedTime != ""){
                             log('[+] Robo-user '+req.session.ecdsa_req_user+' not allowed to host, client ip: '+req.ip.replace(/f/g, "").replace(/:/g, ""),app_log);
                             res.status(403).send("Forbidden. Error will be reported.");
                         }
