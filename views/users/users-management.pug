@@ -321,8 +321,17 @@ html(lang='en')
                   confirmButtonText: 'Change MFA Mode',
                   focusConfirm: false,
                   preConfirm: () => {
+                      
                     const new_otp_enabled_value = Swal.getPopup().querySelector('#new_otp_enabled').checked
                     const new_token_enabled_value = Swal.getPopup().querySelector('#new_token_enabled').checked
+                    
+                    validation_arr = [new_otp_enabled_value,new_token_enabled_value];
+                    on_count = validation_arr.filter(function(value){
+                        return value === true;
+                    }).length 
+                    if (on_count == 0) {
+                        Swal.showValidationMessage(`At least one additional authentication factor must be selected`)
+                    }
 
                     return { new_otp_enabled: new_otp_enabled_value, new_token_enabled: new_token_enabled_value }
                   }

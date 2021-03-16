@@ -208,11 +208,6 @@ html(lang='en')
                     on_count = validation_arr.filter(function(value){
                         return value === true;
                     }).length 
-                    console.log(on_count);
-                    console.log(enforce);
-                    console.log(complain);
-                    console.log(disabled);
-                    console.log(validation_arr);
                     if (on_count > 1) {
                         Swal.showValidationMessage(`Please read the descriprion and fill the fields accordingly`)
                     }
