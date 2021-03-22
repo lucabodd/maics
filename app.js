@@ -69,14 +69,54 @@ app.get(/^\/(?!api).*/, function(req,res,next){
             next();
 });
 
-app.get('/home/tech/*', function(req,res,next){
+// Routes segregation for roles
+//tech and administrators
+app.get('/keys/*', function(req,res,next){
     if (req.session.role == "user") {
         log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
-        res.status(403)
-        res.render('error', {
-            message: "403",
-            error: {status: "Forbidden", detail: "You are not authorized to see this page"}
-        });
+        res.status(403);
+        res.render('error-403');
+    }
+    else {
+        next();
+    }
+});
+//routes for admin
+app.get('/users/*', function(req,res,next){
+    if (req.session.role != "admin") {
+        log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
+        res.status(403);
+        res.render('error-403');
+    }
+    else {
+        next();
+    }
+});
+app.get('/hosts/*', function(req,res,next){
+    if (req.session.role != "admin") {
+        log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
+        res.status(403);
+        res.render('error-403');
+    }
+    else {
+        next();
+    }
+});
+app.get('/access/*', function(req,res,next){
+    if (req.session.role != "admin") {
+        log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
+        res.status(403);
+        res.render('error-403');
+    }
+    else {
+        next();
+    }
+});
+app.get('/confinement/*', function(req,res,next){
+    if (req.session.role != "admin") {
+        log("[*] Unauthorized user is trying to access host-mgmt page from: "+req.ip.replace(/f/g, "").replace(/:/g, "")+" User Agent: "+req.get('User-Agent'),app_log)
+        res.status(403);
+        res.render('error-403');
     }
     else {
         next();
