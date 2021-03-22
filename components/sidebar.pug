@@ -1,15 +1,16 @@
 // Page Sidebar Start
 - var status = (sidebar_open ? 'open' : (sidebar_image ? 'native-image-bg' : ''));
 
+if role == "user"
+ - var status = "iconbar-second-close"
 .iconsidebar-menu(class=status)
-
                     div.sidebar
                         ul.iconMenu-bar.custom-scrollbar
                             li
                                 a.bar-icons(href='javascript:void(0)')
                                     //img(src='../assets/images/menu/home.png' alt='')
                                     i.pe-7s-home
-                                    span Home    
+                                    span Home
                                 ul.iconbar-mainmenu.custom-scrollbar
                                     li.iconbar-header Quick Start
                                     li
@@ -18,115 +19,114 @@
                                     li.iconbar-header.sub-header Help
                                     li
                                         a(href='../starter-kit/index.html')
-                                        | Find Useful Resources  
-                                                    
-                                    
-                            li
-                                a.bar-icons(href='javascript:void(0)')
-                                    i.pe-7s-key
-                                    span Keys
-                                ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Manage    
-                                    li
-                                        a(href='/keys/management')
-                                            | SSH Keys
-                                    li
-                                        a(href='/keys/2fa')
-                                            | Setup MFA
-
-                                    li.iconbar-header.sub-header Help
-                                    li
-                                        a(href='../starter-kit/index.html')
-                                            | Find Useful Resources  
-                                            
-                                            
-                            li
-                                a.bar-icons(href='javascript:void(0)')
-                                    i.pe-7s-users
-                                    span Users
-                                ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Manage
-                                    li
-                                        a(href='/users/management')
-                                            | Users
-                                    li
-                                        a(href='/users/groups')
-                                            | Groups
-                                    li
-                                        a(href='/users/roles')
-                                            | Roles    
-                                    li
-                                        a(href='/users/robots')
-                                            | Robots
-                                            
-                                    li.iconbar-header.sub-header Help
-                                    li
-                                        a(href='../starter-kit/index.html')
                                             | Find Useful Resources 
-                            
-                            li
-                                a.bar-icons(href='javascript:void(0)')
-                                    i.icofont.icofont-server
-                                    span Hosts
-                                ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Manage
-                                    li
-                                        a(href='/hosts/management')
-                                            | Hosts
-                                    li
-                                        a(href='/hosts/hostgroups')
-                                            | Host Groups      
-                                    li.iconbar-header.sub-header Help
-                                    li
-                                        a(href='../starter-kit/index.html')
-                                        | Find Useful Resources  
-                                                      
-                                                            
-                            li
-                                //span.badge.badge-pill.badge-danger Access
-                                a.bar-icons(href='javascript:void(0)')
-                                    i.pe-7s-safe
-                                    span Access
-                                ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Access
-                                    li
-                                        a(href='/access/users')
-                                            | Grant User
-                                    li
-                                        a(href='/access/groups')
-                                            | Grant Groups
-                                    li
-                                        a(href='/access/robots')
-                                            | Grant Robots
-                                    li.iconbar-header.sub-header Reports
-                                    li
-                                        a(href='/access/compliance')
-                                            | Access Compliance
-                                    li.iconbar-header.sub-header Help
-                                    li
-                                        a(href='../starter-kit/index.html')
-                                            | Find Useful Resources  
                                                     
-                                   
-                            li
-                                a.bar-icons(href='javascript:void(0)')
-                                    i.icofont.icofont-jail
-                                    span Confine
-                                ul.iconbar-mainmenu.custom-scrollbar
-                                    li.iconbar-header Restricted Shells
-                                    li
-                                        a(href='/confinement/shells/command-sets')
-                                            | Define Command Sets
-                                    li
-                                        a(href='/confinement/shells/management')
-                                            | Manage Shells
-                                    li
-                                        a(href='/confinement/shells/assign')
-                                            | Assign Shell
-                                    li.iconbar-header.sub-header Help
-                                    li
-                                        a(href='../starter-kit/index.html')
-                                            | Find Useful Resources  
-                                                    
+                            if role != "user"    
+                                li
+                                    a.bar-icons(href='javascript:void(0)')
+                                        i.pe-7s-key
+                                        span Keys
+                                    ul.iconbar-mainmenu.custom-scrollbar
+                                        li.iconbar-header Manage    
+                                        li
+                                            a(href='/keys/management')
+                                                | SSH Keys
+                                        li
+                                            a(href='/keys/2fa')
+                                                | Setup MFA
 
+                                        li.iconbar-header.sub-header Help
+                                        li
+                                            a(href='../starter-kit/index.html')
+                                                | Find Useful Resources  
+                                            
+                            if role == "admin"            
+                                li
+                                    a.bar-icons(href='javascript:void(0)')
+                                        i.pe-7s-users
+                                        span Users
+                                    ul.iconbar-mainmenu.custom-scrollbar
+                                        li.iconbar-header Manage
+                                        li
+                                            a(href='/users/management')
+                                                | Users
+                                        li
+                                            a(href='/users/groups')
+                                                | Groups
+                                        li
+                                            a(href='/users/roles')
+                                                | Roles    
+                                        li
+                                            a(href='/users/robots')
+                                                | Robots
+                                                
+                                        li.iconbar-header.sub-header Help
+                                        li
+                                            a(href='../starter-kit/index.html')
+                                                | Find Useful Resources 
+                                
+                                li
+                                    a.bar-icons(href='javascript:void(0)')
+                                        i.icofont.icofont-server
+                                        span Hosts
+                                    ul.iconbar-mainmenu.custom-scrollbar
+                                        li.iconbar-header Manage
+                                        li
+                                            a(href='/hosts/management')
+                                                | Hosts
+                                        li
+                                            a(href='/hosts/hostgroups')
+                                                | Host Groups      
+                                        li.iconbar-header.sub-header Help
+                                        li
+                                            a(href='../starter-kit/index.html')
+                                            | Find Useful Resources  
+                                                          
+                                                                
+                                li
+                                    //span.badge.badge-pill.badge-danger Access
+                                    a.bar-icons(href='javascript:void(0)')
+                                        i.pe-7s-safe
+                                        span Access
+                                    ul.iconbar-mainmenu.custom-scrollbar
+                                        li.iconbar-header Access
+                                        li
+                                            a(href='/access/users')
+                                                | Grant User
+                                        li
+                                            a(href='/access/groups')
+                                                | Grant Groups
+                                        li
+                                            a(href='/access/robots')
+                                                | Grant Robots
+                                        li.iconbar-header.sub-header Reports
+                                        li
+                                            a(href='/access/compliance')
+                                                | Access Compliance
+                                        li.iconbar-header.sub-header Help
+                                        li
+                                            a(href='../starter-kit/index.html')
+                                                | Find Useful Resources  
+                                                        
+                                       
+                                li
+                                    a.bar-icons(href='javascript:void(0)')
+                                        i.icofont.icofont-jail
+                                        span Confine
+                                    ul.iconbar-mainmenu.custom-scrollbar
+                                        li.iconbar-header Restricted Shells
+                                        li
+                                            a(href='/confinement/shells/command-sets')
+                                                | Define Command Sets
+                                        li
+                                            a(href='/confinement/shells/management')
+                                                | Manage Shells
+                                        li
+                                            a(href='/confinement/shells/assign')
+                                                | Assign Shell
+                                        li.iconbar-header.sub-header Help
+                                        li
+                                            a(href='../starter-kit/index.html')
+                                                | Find Useful Resources  
+                                                    
 // Page Sidebar Ends
