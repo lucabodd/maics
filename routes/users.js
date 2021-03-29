@@ -43,8 +43,14 @@ router.get('/management', function (req, res, next) {
                     Promise.all([users, userCount, groups])
                         .then(
                             function (value) {
+                                users = value[0].map(function(el){
+                                    humanReadableChangedTime = ztime.convertToHumanReadable(el.pwdChangedTime)
+                                    humanReadableChangedTime += " ("+ztime.daysDiff(el.pwdChangedTime)+" days old)";
+                                    el.pwdChangedTime = humanReadableChangedTime
+                                    return el
+                                })
                                 res.render('users-management', {
-                                    users: value[0],
+                                    users: users,
                                     user_count: value[1],
                                     sys_username: req.session.sys_username,
                                     role: req.session.role,

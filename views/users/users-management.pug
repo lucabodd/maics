@@ -136,9 +136,10 @@ html(lang='en')
                                                     thead
                                                         tr
                                                             th Name
-                                                            th SKDC Role
+                                                            th MAICS Role
                                                             th Email
                                                             th Group
+                                                            th Password Changed Time
                                                             th Lock
                                                             th Key Stat
                                                             th Act.
@@ -150,6 +151,7 @@ html(lang='en')
                                                                     td=u.role
                                                                     td=u.email
                                                                     td=u.group
+                                                                    td=u.pwdChangedTime
                                                                     
                                                                     //lock status
                                                                     if u.pwdAccountLockedTime

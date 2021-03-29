@@ -34,5 +34,13 @@ ZT.prototype.minutesDiff = function(ztime)
     diffHours = Math.ceil(diffTime / (1000 * 60));
     return diffHours;
 }
+ZT.prototype.daysDiff = function(ztime)
+{
+    now = this.convertToJs(this.current())
+    delta = this.convertToJs(ztime)
+    diffTime = Math.abs(now - delta);
+    diffHours = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffHours;
+}
 
 module.exports = ZT;
