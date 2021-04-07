@@ -161,9 +161,9 @@ router.post('/deploy-ssh-key', function (req, res, next) {
         var root_password = req.body.root_password;
         var hostname = req.body.hostname;
 
-        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u root -e 'ansible_ssh_pass="Nab2Blim!"'
-        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" ansible_become_pass="Nab2Blim!" su=true'
-        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="Oncealib3$" sudo=true'
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u root -e 'ansible_ssh_pass="r00tpass"'
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="us3rp4ass" ansible_become_pass="r00tpass" su=true'
+        //ansible-playbook -i maics-db-01, /var/www/MAICS/ansible/playbooks/ssh-copy-id.yml -u itadm -e 'ansible_ssh_pass="us3rp4ass" sudo=true'
 
         base_command="export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i "+hostname+", "+maics_dir+"ansible/playbooks/ssh-copy-id.yml -u ";
         //auth with su
